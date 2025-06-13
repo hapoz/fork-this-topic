@@ -1,0 +1,6 @@
+{
+  "recommendations": [
+    "justjavac.vscode-deno-extensionpack",
+    "ms-vscode-remote.vscode-remote-extensionpack"
+  ]
+}
