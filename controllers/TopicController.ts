@@ -122,7 +122,9 @@ export class TopicController {
     try {
       const filters: TopicFilters = {
         page: req.query.page ? parseInt(req.query.page as string) : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        limit: req.query.limit
+          ? parseInt(req.query.limit as string)
+          : undefined,
         parentTopicId: req.query.parentTopicId as string,
         search: req.query.search as string,
       };
@@ -161,7 +163,10 @@ export class TopicController {
   async getTopicVersion(req: Request, res: Response): Promise<void> {
     try {
       const { topicId, version } = req.params;
-      const topicVersion = await this.topicService.getTopicVersion(topicId, parseInt(version));
+      const topicVersion = await this.topicService.getTopicVersion(
+        topicId,
+        parseInt(version),
+      );
 
       if (!topicVersion) {
         res.status(404).json({
@@ -211,7 +216,10 @@ export class TopicController {
   async findShortestPath(req: Request, res: Response): Promise<void> {
     try {
       const { fromTopicId, toTopicId } = req.params;
-      const result = await this.topicService.findShortestPath(fromTopicId, toTopicId);
+      const result = await this.topicService.findShortestPath(
+        fromTopicId,
+        toTopicId,
+      );
 
       res.status(200).json({
         success: true,
@@ -228,7 +236,7 @@ export class TopicController {
   async searchTopics(req: Request, res: Response): Promise<void> {
     try {
       const { q } = req.query;
-      
+
       if (!q || typeof q !== 'string') {
         res.status(400).json({
           success: false,
@@ -250,4 +258,4 @@ export class TopicController {
       } as ApiResponse);
     }
   }
-} 
+}

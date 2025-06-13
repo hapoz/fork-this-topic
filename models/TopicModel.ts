@@ -4,7 +4,9 @@ import { BaseModel } from './BaseModel.ts';
 export class TopicModel extends BaseModel<Topic> {
   private versions: Map<string, TopicVersion[]> = new Map();
 
-  async createTopic(topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>): Promise<Topic> {
+  async createTopic(
+    topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>,
+  ): Promise<Topic> {
     const topic = await this.create({
       ...topicData,
       version: 1,
@@ -15,7 +17,10 @@ export class TopicModel extends BaseModel<Topic> {
     return topic;
   }
 
-  async updateTopic(id: string, updates: Partial<Omit<Topic, 'id' | 'createdAt' | 'version'>>): Promise<Topic | null> {
+  async updateTopic(
+    id: string,
+    updates: Partial<Omit<Topic, 'id' | 'createdAt' | 'version'>>,
+  ): Promise<Topic | null> {
     const existingTopic = await this.findById(id);
     if (!existingTopic) {
       return null;
@@ -56,27 +61,30 @@ export class TopicModel extends BaseModel<Topic> {
     return this.versions.get(topicId) || [];
   }
 
-  async getVersion(topicId: string, version: number): Promise<TopicVersion | null> {
+  async getVersion(
+    topicId: string,
+    version: number,
+  ): Promise<TopicVersion | null> {
     const versions = await this.getVersions(topicId);
-    return versions.find(v => v.version === version) || null;
+    return versions.find((v) => v.version === version) || null;
   }
 
   async getChildren(parentId: string): Promise<Topic[]> {
     const allTopics = await this.findAll();
-    return allTopics.filter(topic => topic.parentTopicId === parentId);
+    return allTopics.filter((topic) => topic.parentTopicId === parentId);
   }
 
   async getRootTopics(): Promise<Topic[]> {
     const allTopics = await this.findAll();
-    return allTopics.filter(topic => !topic.parentTopicId);
+    return allTopics.filter((topic) => !topic.parentTopicId);
   }
 
   async searchTopics(searchTerm: string): Promise<Topic[]> {
     const allTopics = await this.findAll();
     const term = searchTerm.toLowerCase();
-    return allTopics.filter(topic => 
-      topic.name.toLowerCase().includes(term) || 
+    return allTopics.filter((topic) =>
+      topic.name.toLowerCase().includes(term) ||
       topic.content.toLowerCase().includes(term)
     );
   }
-} 
+}

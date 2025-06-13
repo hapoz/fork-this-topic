@@ -69,13 +69,20 @@ app.use('*', (req, res) => {
 });
 
 // Global error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error',
-  });
-});
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    console.error('Error:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+    });
+  },
+);
 
 // Start server
 app.listen(parseInt(PORT), () => {
@@ -85,4 +92,4 @@ app.listen(parseInt(PORT), () => {
   console.log(`📖 API docs: http://localhost:${PORT}/api/topics`);
 });
 
-export default app; 
+export default app;

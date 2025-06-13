@@ -1,4 +1,8 @@
-import { assertEquals, assertExists, assertNull } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import {
+  assertEquals,
+  assertExists,
+  assertNull,
+} from 'https://deno.land/std@0.208.0/assert/mod.ts';
 import { TopicModel } from '../models/TopicModel.ts';
 import { TopicService } from '../services/TopicService.ts';
 
@@ -167,9 +171,12 @@ Deno.test('TopicService - findShortestPath non-existent', async () => {
   const topicModel = new TopicModel();
   const topicService = new TopicService(topicModel);
 
-  const result = await topicService.findShortestPath('non-existent-1', 'non-existent-2');
+  const result = await topicService.findShortestPath(
+    'non-existent-1',
+    'non-existent-2',
+  );
 
   assertEquals(result.exists, false);
   assertEquals(result.path.length, 0);
   assertEquals(result.distance, -1);
-}); 
+});

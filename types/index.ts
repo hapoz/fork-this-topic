@@ -35,14 +35,14 @@ export interface User extends BaseEntity {
 export enum UserRole {
   ADMIN = 'Admin',
   EDITOR = 'Editor',
-  VIEWER = 'Viewer'
+  VIEWER = 'Viewer',
 }
 
 export enum ResourceType {
   VIDEO = 'video',
   ARTICLE = 'article',
   PDF = 'pdf',
-  LINK = 'link'
+  LINK = 'link',
 }
 
 export interface TopicTree extends Topic {
@@ -70,4 +70,4 @@ export interface ShortestPathResult {
   path: string[];
   distance: number;
   exists: boolean;
-} 
+}

@@ -26,7 +26,7 @@ export abstract class BaseModel<T extends BaseEntity> {
   async create(entity: Omit<T, 'id' | 'createdAt' | 'updatedAt'>): Promise<T> {
     const id = this.generateId();
     const baseEntity = this.createBaseEntity();
-    
+
     const newEntity = {
       ...entity,
       ...baseEntity,
@@ -37,7 +37,10 @@ export abstract class BaseModel<T extends BaseEntity> {
     return newEntity;
   }
 
-  async update(id: string, updates: Partial<Omit<T, 'id' | 'createdAt'>>): Promise<T | null> {
+  async update(
+    id: string,
+    updates: Partial<Omit<T, 'id' | 'createdAt'>>,
+  ): Promise<T | null> {
     const entity = this.data.get(id);
     if (!entity) {
       return null;
@@ -64,4 +67,4 @@ export abstract class BaseModel<T extends BaseEntity> {
   async count(): Promise<number> {
     return this.data.size;
   }
-} 
+}

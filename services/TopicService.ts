@@ -1,5 +1,11 @@
 import { TopicModel } from '../models/TopicModel.ts';
-import { ShortestPathResult, Topic, TopicFilters, TopicTree, TopicVersion } from '../types/index.ts';
+import {
+  ShortestPathResult,
+  Topic,
+  TopicFilters,
+  TopicTree,
+  TopicVersion,
+} from '../types/index.ts';
 import { ITopicService } from './interfaces/ITopicService.ts';
 
 export class TopicService implements ITopicService {
@@ -9,7 +15,9 @@ export class TopicService implements ITopicService {
     this.topicModel = topicModel;
   }
 
-  async createTopic(topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>): Promise<Topic> {
+  async createTopic(
+    topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>,
+  ): Promise<Topic> {
     return await this.topicModel.createTopic(topicData);
   }
 
@@ -17,7 +25,10 @@ export class TopicService implements ITopicService {
     return await this.topicModel.findById(id);
   }
 
-  async updateTopic(id: string, updates: Partial<Omit<Topic, 'id' | 'createdAt' | 'version'>>): Promise<Topic | null> {
+  async updateTopic(
+    id: string,
+    updates: Partial<Omit<Topic, 'id' | 'createdAt' | 'version'>>,
+  ): Promise<Topic | null> {
     return await this.topicModel.updateTopic(id, updates);
   }
 
@@ -29,7 +40,9 @@ export class TopicService implements ITopicService {
     let topics = await this.topicModel.findAll();
 
     if (filters?.parentTopicId) {
-      topics = topics.filter(topic => topic.parentTopicId === filters.parentTopicId);
+      topics = topics.filter((topic) =>
+        topic.parentTopicId === filters.parentTopicId
+      );
     }
 
     if (filters?.search) {
@@ -50,7 +63,10 @@ export class TopicService implements ITopicService {
     return await this.topicModel.getVersions(topicId);
   }
 
-  async getTopicVersion(topicId: string, version: number): Promise<TopicVersion | null> {
+  async getTopicVersion(
+    topicId: string,
+    version: number,
+  ): Promise<TopicVersion | null> {
     return await this.topicModel.getVersion(topicId, version);
   }
 
@@ -66,7 +82,7 @@ export class TopicService implements ITopicService {
   private async buildTopicTree(topic: Topic): Promise<TopicTree> {
     const children = await this.topicModel.getChildren(topic.id);
     const childTrees = await Promise.all(
-      children.map(child => this.buildTopicTree(child))
+      children.map((child) => this.buildTopicTree(child)),
     );
 
     return {
@@ -75,22 +91,28 @@ export class TopicService implements ITopicService {
     };
   }
 
-  async findShortestPath(fromTopicId: string, toTopicId: string): Promise<ShortestPathResult> {
+  async findShortestPath(
+    fromTopicId: string,
+    toTopicId: string,
+  ): Promise<ShortestPathResult> {
     // Custom algorithm to find shortest path between topics
     // Using Breadth-First Search (BFS) for unweighted graph
     const allTopics = await this.topicModel.findAll();
-    const topicMap = new Map(allTopics.map(topic => [topic.id, topic]));
-    
+    const topicMap = new Map(allTopics.map((topic) => [topic.id, topic]));
+
     if (!topicMap.has(fromTopicId) || !topicMap.has(toTopicId)) {
       return { path: [], distance: -1, exists: false };
     }
 
-    const queue: Array<{ id: string; path: string[] }> = [{ id: fromTopicId, path: [fromTopicId] }];
+    const queue: Array<{ id: string; path: string[] }> = [{
+      id: fromTopicId,
+      path: [fromTopicId],
+    }];
     const visited = new Set<string>();
 
     while (queue.length > 0) {
       const current = queue.shift()!;
-      
+
       if (current.id === toTopicId) {
         return {
           path: current.path,
@@ -115,7 +137,7 @@ export class TopicService implements ITopicService {
       }
 
       // Add children to path
-      const children = allTopics.filter(t => t.parentTopicId === current.id);
+      const children = allTopics.filter((t) => t.parentTopicId === current.id);
       for (const child of children) {
         if (!visited.has(child.id)) {
           queue.push({
@@ -132,4 +154,4 @@ export class TopicService implements ITopicService {
   async searchTopics(searchTerm: string): Promise<Topic[]> {
     return await this.topicModel.searchTopics(searchTerm);
   }
-} 
+}
