@@ -1,10 +1,10 @@
+import { TopicModel } from '@/models/TopicModel.ts';
+import { TopicService } from '@/services/TopicService.ts';
 import {
   assertEquals,
   assertExists,
   assertNull,
 } from 'https://deno.land/std@0.208.0/assert/mod.ts';
-import { TopicModel } from '../models/TopicModel.ts';
-import { TopicService } from '../services/TopicService.ts';
 
 Deno.test('TopicService - createTopic', async () => {
   const topicModel = new TopicModel();

@@ -4,18 +4,18 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 
 // Models
-import { ResourceModel } from './models/ResourceModel.ts';
-import { TopicModel } from './models/TopicModel.ts';
-import { UserModel } from './models/UserModel.ts';
+import { ResourceModel } from '@/models/ResourceModel.ts';
+import { TopicModel } from '@/models/TopicModel.ts';
+import { UserModel } from '@/models/UserModel.ts';
 
 // Services
-import { TopicService } from './services/TopicService.ts';
+import { TopicService } from '@/services/TopicService.ts';
 
 // Controllers
-import { TopicController } from './controllers/TopicController.ts';
+import { TopicController } from '@/controllers/TopicController.ts';
 
 // Routes
-import { createTopicRoutes } from './routes/topicRoutes.ts';
+import { createTopicRoutes } from '@/routes/topicRoutes.ts';
 
 // Initialize models
 const topicModel = new TopicModel();

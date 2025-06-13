@@ -1,5 +1,5 @@
-import { User, UserRole } from '../types/index.ts';
-import { BaseModel } from './BaseModel.ts';
+import { BaseModel } from '@/models/BaseModel.ts';
+import { User, UserRole } from '@/types/index.ts';
 
 export class UserModel extends BaseModel<User> {
   async findByEmail(email: string): Promise<User | null> {

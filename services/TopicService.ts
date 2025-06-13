@@ -1,12 +1,12 @@
-import { TopicModel } from '../models/TopicModel.ts';
+import { TopicModel } from '@/models/TopicModel.ts';
+import { ITopicService } from '@/services/interfaces/ITopicService.ts';
 import {
   ShortestPathResult,
   Topic,
   TopicFilters,
   TopicTree,
   TopicVersion,
-} from '../types/index.ts';
-import { ITopicService } from './interfaces/ITopicService.ts';
+} from '@/types/index.ts';
 
 export class TopicService implements ITopicService {
   private topicModel: TopicModel;

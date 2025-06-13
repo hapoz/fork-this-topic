@@ -1,6 +1,6 @@
+import { ITopicService } from '@/services/interfaces/ITopicService.ts';
+import { ApiResponse, TopicFilters } from '@/types/index.ts';
 import { Request, Response } from 'express';
-import { ITopicService } from '../services/interfaces/ITopicService.ts';
-import { ApiResponse, TopicFilters } from '../types/index.ts';
 
 export class TopicController {
   private topicService: ITopicService;

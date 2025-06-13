@@ -1,5 +1,5 @@
-import { Resource } from '../types/index.ts';
-import { BaseModel } from './BaseModel.ts';
+import { BaseModel } from '@/models/BaseModel.ts';
+import { Resource } from '@/types/index.ts';
 
 export class ResourceModel extends BaseModel<Resource> {
   async findByTopicId(topicId: string): Promise<Resource[]> {

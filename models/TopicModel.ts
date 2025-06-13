@@ -1,5 +1,5 @@
-import { Topic, TopicVersion } from '../types/index.ts';
-import { BaseModel } from './BaseModel.ts';
+import { BaseModel } from '@/models/BaseModel.ts';
+import { Topic, TopicVersion } from '@/types/index.ts';
 
 export class TopicModel extends BaseModel<Topic> {
   private versions: Map<string, TopicVersion[]> = new Map();

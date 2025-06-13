@@ -1,4 +1,4 @@
-import { BaseEntity } from '../types/index.ts';
+import { BaseEntity } from '@/types/index.ts';
 
 export abstract class BaseModel<T extends BaseEntity> {
   protected data: Map<string, T> = new Map();

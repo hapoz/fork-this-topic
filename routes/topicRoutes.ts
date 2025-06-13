@@ -1,5 +1,5 @@
+import { TopicController } from '@/controllers/TopicController.ts';
 import { Request, Response, Router } from 'express';
-import { TopicController } from '../controllers/TopicController.ts';
 
 export function createTopicRoutes(topicController: TopicController): Router {
   const router = Router();

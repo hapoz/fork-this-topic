@@ -4,7 +4,7 @@ import {
   TopicFilters,
   TopicTree,
   TopicVersion,
-} from '../../types/index.ts';
+} from '@/types/index.ts';
 
 export interface ITopicService {
   createTopic(
