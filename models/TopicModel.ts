@@ -1,3 +1,4 @@
+import { TopicVersionFactory } from '@/factories/TopicVersionFactory.ts';
 import { BaseModel } from '@/models/BaseModel.ts';
 import { Topic, TopicVersion } from '@/types/index.ts';
 
@@ -38,16 +39,8 @@ export class TopicModel extends BaseModel<Topic> {
   }
 
   async createVersion(topicId: string, topic: Topic): Promise<TopicVersion> {
-    const version: TopicVersion = {
-      id: this.generateId(),
-      topicId,
-      name: topic.name,
-      content: topic.content,
-      version: topic.version,
-      parentTopicId: topic.parentTopicId,
-      createdAt: topic.createdAt,
-      updatedAt: topic.updatedAt,
-    };
+    // Use the factory instead of manual creation
+    const version = TopicVersionFactory.createVersion(topic, topic.version);
 
     if (!this.versions.has(topicId)) {
       this.versions.set(topicId, []);

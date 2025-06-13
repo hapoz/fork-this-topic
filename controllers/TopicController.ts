@@ -1,6 +1,7 @@
 import { ITopicService } from '@/services/interfaces/ITopicService.ts';
 import { ApiResponse, TopicFilters } from '@/types/index.ts';
 import { Request, Response } from 'express';
+import { PermissionStrategyFactory } from '../auth/PermissionStrategy.ts';
 
 export class TopicController {
   private topicService: ITopicService;
@@ -11,7 +12,20 @@ export class TopicController {
 
   async createTopic(req: Request, res: Response): Promise<void> {
     try {
-      const { name, content, parentTopicId } = req.body;
+      const { name, content, parentTopicId, user } = req.body;
+      // Get user role from request (after authentication)
+      const userRole = user?.role || 'viewer';
+      const permissionStrategy = PermissionStrategyFactory.createStrategy(
+        userRole,
+      );
+
+      if (!permissionStrategy.canCreateTopic()) {
+        res.status(403).json({
+          success: false,
+          error: 'Insufficient permissions to create topics',
+        });
+        return;
+      }
 
       if (!name || !content) {
         res.status(400).json({
