@@ -4,18 +4,18 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 
 // Models
-import { ResourceModel } from './src/models/ResourceModel.ts';
-import { TopicModel } from './src/models/TopicModel.ts';
-import { UserModel } from './src/models/UserModel.ts';
+import { ResourceModel } from './models/ResourceModel.ts';
+import { TopicModel } from './models/TopicModel.ts';
+import { UserModel } from './models/UserModel.ts';
 
 // Services
-import { TopicService } from './src/services/TopicService.ts';
+import { TopicService } from './services/TopicService.ts';
 
 // Controllers
-import { TopicController } from './src/controllers/TopicController.ts';
+import { TopicController } from './controllers/TopicController.ts';
 
 // Routes
-import { createTopicRoutes } from './src/routes/topicRoutes.ts';
+import { createTopicRoutes } from './routes/topicRoutes.ts';
 
 // Initialize models
 const topicModel = new TopicModel();
@@ -30,7 +30,7 @@ const topicController = new TopicController(topicService);
 
 // Create Express app
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Deno.env.get('PORT') || '3000';
 
 // Security middleware
 app.use(helmet());
@@ -78,7 +78,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(parseInt(PORT), () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📚 Dynamic Knowledge Base API`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);

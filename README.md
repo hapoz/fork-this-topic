@@ -1,7 +1,7 @@
 # Dynamic Knowledge Base API
 
 A RESTful API for managing interconnected topics and resources with version
-control, user roles, and permissions. Built with Express.js, TypeScript, and
+control, user roles, and permissions. Built with **Deno 2**, Express.js, TypeScript, and
 following advanced OOP principles and design patterns.
 
 ## Features
@@ -11,52 +11,64 @@ following advanced OOP principles and design patterns.
 - **Custom Algorithms**: Shortest path finding between topics
 - **Recursive Topic Trees**: Get complete topic hierarchies
 - **Advanced OOP Design**: Abstract classes, interfaces, and design patterns
-- **Comprehensive Testing**: Unit and integration tests
+- **Comprehensive Testing**: Unit and integration tests using Deno's built-in test runner
 - **Security**: Rate limiting, CORS, and Helmet protection
+- **Deno 2 Integration**: Leveraging Deno's embedded features and modern tooling
 
 ## Tech Stack
 
-- **Runtime**: Node.js with TypeScript
+- **Runtime**: Deno 2 with TypeScript
 - **Framework**: Express.js
 - **Architecture**: MVC with Service Layer
 - **Design Patterns**: Factory, Strategy, Composite
-- **Testing**: Jest with TypeScript support
+- **Testing**: Deno's built-in test runner with assertions
 - **Security**: Helmet, CORS, Rate Limiting
+- **Package Management**: Deno's import maps and npm compatibility
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
+- **Deno 2** (latest version)
+- No Node.js or npm required!
 
 ## Quick Start
 
-1. **Install dependencies**
+1. **Clone the repository**
    ```bash
-   npm install
+   git clone <repository-url>
+   cd dynamic-knowledge-base-api
    ```
 
 2. **Start the development server**
    ```bash
-   npm run dev
+   deno task dev
    ```
 
-3. **Build for production**
+3. **Run tests**
    ```bash
-   npm run build
-   npm start
+   deno task test
    ```
 
-## Testing
+4. **Start production server**
+   ```bash
+   deno task start
+   ```
+
+## Available Tasks
 
 ```bash
-# Run all tests
-npm test
+# Development
+deno task dev          # Start development server with watch mode
+deno task start        # Start production server
 
-# Run tests in watch mode
-npm run test:watch
+# Testing
+deno task test         # Run all tests
+deno task test:watch   # Run tests in watch mode
+deno task test:coverage # Run tests with coverage
 
-# Run tests with coverage
-npm run test:coverage
+# Code Quality
+deno task fmt          # Format code
+deno task lint         # Lint code
+deno task check        # Type check
 ```
 
 ## API Documentation
@@ -160,7 +172,6 @@ GET /topics/search?q=javascript
 ### Project Structure
 
 ```
-src/
 ├── models/          # Data models and database abstraction
 ├── services/        # Business logic layer
 ├── controllers/     # HTTP request handlers
@@ -168,8 +179,20 @@ src/
 ├── middleware/      # Express middleware
 ├── types/           # TypeScript type definitions
 ├── utils/           # Utility functions
-└── test/            # Test files
+├── test/            # Test files
+├── deno.json        # Deno configuration
+└── main.ts          # Application entry point
 ```
+
+## Deno 2 Features Used
+
+- **Import Maps**: Clean dependency management without package.json
+- **Built-in Testing**: No external test runner needed
+- **Built-in Formatting**: `deno fmt` for consistent code style
+- **Built-in Linting**: `deno lint` for code quality
+- **Type Checking**: `deno check` for compile-time type safety
+- **Permissions**: Secure by default with explicit permissions
+- **npm Compatibility**: Seamless use of npm packages
 
 ## API Response Format
 
@@ -191,3 +214,59 @@ All API responses follow a consistent format:
 - **Helmet**: Security headers for Express
 - **Input Validation**: Request body validation
 - **Error Handling**: Comprehensive error handling without exposing internals
+- **Deno Permissions**: Secure by default with explicit network and file access
+
+## Environment Variables
+
+The application uses Deno's environment variable access:
+
+```bash
+# Set port (optional, defaults to 3000)
+export PORT=3000
+```
+
+## Testing Strategy
+
+- **Unit Tests**: Test individual components in isolation
+- **Integration Tests**: Test component interactions
+- **Deno Test Runner**: Built-in testing framework
+- **Assertions**: Using Deno's standard library assertions
+- **High Coverage**: Comprehensive test coverage
+
+## Deployment
+
+1. **Using Deno Deploy** (recommended):
+   ```bash
+   # Deploy to Deno Deploy
+   deno deploy --project=your-project-name main.ts
+   ```
+
+2. **Self-hosted**:
+   ```bash
+   # Run in production
+   deno task start
+   ```
+
+## Why Deno 2?
+
+- **Modern Runtime**: Built with Rust, faster than Node.js
+- **Security First**: Secure by default with explicit permissions
+- **Built-in Tools**: No need for external tooling (testing, formatting, linting)
+- **TypeScript Native**: First-class TypeScript support
+- **Import Maps**: Clean dependency management
+- **npm Compatibility**: Can use existing npm packages
+- **Single Binary**: Easy deployment and distribution
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass: `deno task test`
+6. Format code: `deno task fmt`
+7. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
