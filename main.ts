@@ -9,13 +9,22 @@ import { TopicModel } from '@/models/TopicModel.ts';
 import { UserModel } from '@/models/UserModel.ts';
 
 // Services
+import { ResourceService } from '@/services/ResourceService.ts';
 import { TopicService } from '@/services/TopicService.ts';
+import { UserService } from '@/services/UserService.ts';
 
 // Controllers
+import { ResourceController } from '@/controllers/ResourceController.ts';
 import { TopicController } from '@/controllers/TopicController.ts';
+import { UserController } from '@/controllers/UserController.ts';
 
 // Routes
+import { createResourceRoutes } from '@/routes/resourceRoutes.ts';
 import { createTopicRoutes } from '@/routes/topicRoutes.ts';
+import { createUserRoutes } from '@/routes/userRoutes.ts';
+
+// Auth Middleware
+import { AuthMiddleware } from '@/auth/AuthMiddleware.ts';
 
 // Initialize models
 const topicModel = new TopicModel();
@@ -24,9 +33,13 @@ const userModel = new UserModel();
 
 // Initialize services
 const topicService = new TopicService(topicModel);
+const resourceService = new ResourceService(resourceModel);
+const userService = new UserService(userModel);
 
 // Initialize controllers
 const topicController = new TopicController(topicService);
+const resourceController = new ResourceController(resourceService);
+const userController = new UserController(userService);
 
 // Create Express app
 const app = express();
@@ -57,8 +70,28 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
-app.use('/api/topics', createTopicRoutes(topicController));
+// Public routes (no authentication required)
+app.use('/api/users', createUserRoutes(userController));
+
+// Protected routes (authentication required)
+app.use(
+  '/api/topics',
+  AuthMiddleware.authenticate,
+  createTopicRoutes(topicController),
+);
+app.use(
+  '/api/resources',
+  AuthMiddleware.authenticate,
+  createResourceRoutes(resourceController),
+);
+
+// Admin-only routes
+app.use(
+  '/api/admin/users',
+  AuthMiddleware.authenticate,
+  AuthMiddleware.requireAdmin,
+  createUserRoutes(userController),
+);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -89,7 +122,11 @@ app.listen(parseInt(PORT), () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📚 Dynamic Knowledge Base API`);
   console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  console.log(`📖 API docs: http://localhost:${PORT}/api/topics`);
+  console.log(`📖 API docs:`);
+  console.log(`   - Topics: http://localhost:${PORT}/api/topics`);
+  console.log(`   - Resources: http://localhost:${PORT}/api/resources`);
+  console.log(`   - Users: http://localhost:${PORT}/api/users`);
+  console.log(`   - Admin: http://localhost:${PORT}/api/admin/users`);
 });
 
 export default app;
