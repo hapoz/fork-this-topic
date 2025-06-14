@@ -1,4 +1,4 @@
-import { Resource } from '../../types/index.ts';
+import { Resource } from '@/types/index.ts';
 
 export interface IResourceService {
   createResource(

@@ -535,6 +535,12 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/assert@0.218",
+      "jsr:@std/fs@0.218",
+      "jsr:@std/http@0.218",
+      "jsr:@std/json@0.218",
+      "jsr:@std/path@0.218",
+      "jsr:@std/testing@0.218",
       "npm:@types/cors@^2.8.17",
       "npm:@types/express@^4.17.21",
       "npm:@types/uuid@^9.0.7",

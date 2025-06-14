@@ -5,14 +5,34 @@
   "main": "main.ts",
   "exports": "./main.ts",
   "tasks": {
-    "dev": "deno run --watch --allow-net --allow-read --allow-write main.ts",
-    "start": "deno run --allow-net --allow-read --allow-write main.ts",
-    "test": "deno test --allow-net --allow-read --allow-write",
-    "test:watch": "deno test --watch --allow-net --allow-read --allow-write",
-    "test:coverage": "deno test --coverage=coverage --allow-net --allow-read --allow-write",
+    "dev": "deno run --watch --allow-net --allow-read --allow-write --allow-env main.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env main.ts",
+    "start:prod": "deno run --allow-net --allow-read --allow-write --allow-env --no-check main.ts",
+    "test": "deno test --allow-net --allow-read --allow-write --allow-env",
+    "test:watch": "deno test --watch --allow-net --allow-read --allow-write --allow-env",
+    "test:coverage": "deno test --coverage=coverage --allow-net --allow-read --allow-write --allow-env",
+    "test:unit": "deno test --allow-net --allow-read --allow-write --allow-env test/unit/",
+    "test:integration": "deno test --allow-net --allow-read --allow-write --allow-env test/integration/",
+    "test:patterns": "deno test --allow-net --allow-read --allow-write --allow-env test/patterns/",
     "fmt": "deno fmt",
+    "fmt:check": "deno fmt --check",
     "lint": "deno lint",
-    "check": "deno check main.ts"
+    "lint:fix": "deno lint --fix",
+    "check": "deno check main.ts",
+    "check:all": "deno check **/*.ts",
+    "compile": "deno compile --allow-net --allow-read --allow-write --allow-env main.ts",
+    "compile:release": "deno compile --allow-net --allow-read --allow-write --allow-env --target=x86_64-unknown-linux-gnu main.ts",
+    "bench": "deno bench --allow-net --allow-read --allow-write --allow-env",
+    "doc": "deno doc main.ts",
+    "doc:serve": "deno doc --serve=8080 main.ts",
+    "cache": "deno cache main.ts",
+    "cache:reload": "deno cache --reload main.ts",
+    "upgrade": "deno upgrade",
+    "info": "deno info main.ts",
+    "clean": "rm -rf coverage/ .deno_dir/",
+    "preview": "deno run --allow-net --allow-read --allow-write --allow-env --watch main.ts",
+    "validate": "deno fmt --check && deno lint && deno check main.ts",
+    "ci": "deno fmt --check && deno lint && deno check main.ts && deno test --allow-net --allow-read --allow-write --allow-env --coverage=coverage"
   },
   "imports": {
     "@/": "./",
@@ -24,16 +44,38 @@
     "@types/express": "npm:@types/express@^4.17.21",
     "@types/cors": "npm:@types/cors@^2.8.17",
     "@types/uuid": "npm:@types/uuid@^9.0.7",
-    "@std/": "jsr:@std/"
+    "@std/": "jsr:@std/",
+    "@std/testing/": "jsr:@std/testing@^0.218.0",
+    "@std/assert": "jsr:@std/assert@^0.218.0",
+    "@std/path": "jsr:@std/path@^0.218.0",
+    "@std/fs": "jsr:@std/fs@^0.218.0",
+    "@std/http": "jsr:@std/http@^0.218.0",
+    "@std/json": "jsr:@std/json@^0.218.0"
   },
   "compilerOptions": {
     "allowJs": true,
     "lib": ["deno.window"],
-    "strict": true
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false
   },
   "lint": {
     "rules": {
-      "tags": ["recommended"]
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-explicit-any"]
+    },
+    "files": {
+      "include": ["**/*.ts", "**/*.js"],
+      "exclude": ["node_modules/", "coverage/", ".deno_dir/", "dist/"]
     }
   },
   "fmt": {
@@ -42,6 +84,16 @@
     "indentWidth": 2,
     "semiColons": true,
     "singleQuote": true,
-    "proseWrap": "preserve"
+    "proseWrap": "preserve",
+    "include": ["**/*.ts", "**/*.js", "**/*.json", "**/*.md"],
+    "exclude": ["node_modules/", "coverage/", ".deno_dir/", "dist/"]
+  },
+  "test": {
+    "include": ["**/*.test.ts", "**/*_test.ts"],
+    "exclude": ["node_modules/", "coverage/", ".deno_dir/", "dist/"]
+  },
+  "bench": {
+    "include": ["**/*.bench.ts"],
+    "exclude": ["node_modules/", "coverage/", ".deno_dir/", "dist/"]
   }
 }

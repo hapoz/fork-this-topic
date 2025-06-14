@@ -1,18 +1,81 @@
 {
   "deno.enable": true,
   "deno.lint": true,
-  "editor.formatOnSave": true,
+  "deno.unstable": [],
+  "deno.config": "./deno.json",
+  "deno.importMap": "./deno.json",
+  "deno.suggest.imports.hosts": {
+    "https://deno.land": true,
+    "https://cdn.nest.land": true,
+    "https://crux.land": true,
+    "https://esm.sh": true
+  },
   "editor.defaultFormatter": "denoland.vscode-deno",
-  "[typescriptreact]": {
+  "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "[typescript]": {
+  "[javascript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  }
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "denoland.vscode-deno",
+  },
+  "deno.suggest.imports.autoDiscover": true,
+  "deno.codeLens.implementations": true,
+  "deno.codeLens.references": true,
+  "deno.codeLens.referencesAllFunctions": true,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.parameterTypes.enabled": true,
+  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.inlayHints.variableTypes.enabled": true,
+  "typescript.suggest.paths": true,
+  "typescript.suggest.autoImports": true,
+  "typescript.suggest.completeFunctionCalls": true,
+  "deno.suggest.includeCompletionsForModuleExports": true,
+  "deno.suggest.includeCompletionsWithSnippetText": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "files.associations": {
+    "*.ts": "typescript",
+    "*.js": "javascript",
+    "*.json": "json"
+  },
+  "files.exclude": {
+    "**/.deno_dir": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/.DS_Store": true
+  },
+  "search.exclude": {
+    "**/.deno_dir": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/dist": true
+  },
+  "emmet.includeLanguages": {
+    "typescript": "html"
+  },
+  "editor.rulers": [80, 120],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "workbench.colorCustomizations": {
+    "editorBracketMatch.border": "#00ff00",
+    "editorBracketMatch.background": "#00ff0033"
+  },
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
 }

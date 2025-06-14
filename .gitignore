@@ -2,6 +2,28 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=osx,sam,node,linux,windows,yarn,visualstudiocode,cypressio
 
 
+### Docker ###
+# Docker volumes
+docker-data/
+postgres_data/
+mongo_data/
+redis_data/
+
+# Docker logs
+docker-compose.log
+
+# Docker temporary files
+.dockerignore
+
+# Docker environment files (keep .env.example)
+.env
+.env.local
+.env.production
+.env.staging
+
+# Docker build cache
+.docker/
+
 ### SAM ###
 # Ignore build directories for the AWS Serverless Application Model (SAM)
 # Info: https://aws.amazon.com/serverless/sam/
