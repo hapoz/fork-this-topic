@@ -1,21 +1,23 @@
-import { BaseModel } from '@/models/BaseModel.ts';
+import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
+import { MemcachedBaseModel } from '@/models/MemcachedBaseModel.ts';
 import { User, UserRole } from '@/types/index.ts';
 
-export class UserModel extends BaseModel<User> {
+export class UserModel extends MemcachedBaseModel<User> {
+  constructor(db: MemcachedAdapter) {
+    super(db, 'users');
+  }
+
   async findByEmail(email: string): Promise<User | null> {
-    const allUsers = await this.findAll();
-    return allUsers.find((user) => user.email === email) || null;
+    return await this.findOneByField('email', email);
   }
 
   async findByRole(role: UserRole): Promise<User[]> {
-    const allUsers = await this.findAll();
-    return allUsers.filter((user) => user.role === role);
+    return await this.findByField('role', role);
   }
 
   async searchUsers(searchTerm: string): Promise<User[]> {
-    const allUsers = await this.findAll();
     const term = searchTerm.toLowerCase();
-    return allUsers.filter((user) =>
+    return await this.search((user) =>
       user.name.toLowerCase().includes(term) ||
       user.email.toLowerCase().includes(term)
     );

@@ -13,17 +13,37 @@ services:
       - PORT=3000
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-here}
       - NODE_ENV=${NODE_ENV:-development}
+      - MEMCACHED_HOST=memcached
+      - MEMCACHED_PORT=11211
     volumes:
       # Mount source code for development (comment out for production)
       - .:/app
       - /app/node_modules
     restart: unless-stopped
+    depends_on:
+      - memcached
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - knowledge-base-network
+
+  # Memcached for in-memory database
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: knowledge-base-memcached
+    ports:
+      - "11211:11211"
+    command: memcached -m 512 -p 11211 -u memcache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "echo", "stats", "|", "nc", "localhost", "11211"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - knowledge-base-network
 
@@ -48,7 +68,7 @@ services:
   #     - POSTGRES_USER=postgres
   #     - POSTGRES_PASSWORD=${DB_PASSWORD:-password123}
   #   ports:
-  #     - "5432:5432"
+  #     - "5432:54311"
   #   volumes:
   #     - postgres_data:/var/lib/postgresql/data
   #   restart: unless-stopped

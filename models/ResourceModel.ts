@@ -1,21 +1,23 @@
-import { BaseModel } from '@/models/BaseModel.ts';
-import { Resource } from '@/types/index.ts';
+import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
+import { MemcachedBaseModel } from '@/models/MemcachedBaseModel.ts';
+import { Resource, ResourceType } from '@/types/index.ts';
 
-export class ResourceModel extends BaseModel<Resource> {
-  async findByTopicId(topicId: string): Promise<Resource[]> {
-    const allResources = await this.findAll();
-    return allResources.filter((resource) => resource.topicId === topicId);
+export class ResourceModel extends MemcachedBaseModel<Resource> {
+  constructor(db: MemcachedAdapter) {
+    super(db, 'resources');
   }
 
-  async findByType(type: string): Promise<Resource[]> {
-    const allResources = await this.findAll();
-    return allResources.filter((resource) => resource.type === type);
+  async findByTopicId(topicId: string): Promise<Resource[]> {
+    return await this.findByField('topicId', topicId);
+  }
+
+  async findByType(type: ResourceType): Promise<Resource[]> {
+    return await this.findByField('type', type);
   }
 
   async searchResources(searchTerm: string): Promise<Resource[]> {
-    const allResources = await this.findAll();
     const term = searchTerm.toLowerCase();
-    return allResources.filter((resource) =>
+    return await this.search((resource) =>
       resource.description.toLowerCase().includes(term) ||
       resource.url.toLowerCase().includes(term)
     );

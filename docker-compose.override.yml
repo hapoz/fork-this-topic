@@ -6,6 +6,8 @@ services:
     environment:
       - NODE_ENV=development
       - DEBUG=*
+      - MEMCACHED_HOST=memcached
+      - MEMCACHED_PORT=11211
     volumes:
       # Mount source code for hot reloading
       - .:/app
@@ -24,6 +26,16 @@ services:
     ports:
       - '3000:3000'
       - '9229:9229' # For debugging if needed
+    depends_on:
+      - memcached
+
+  memcached:
+    # Development-specific Memcached configuration
+    environment:
+      - MEMCACHED_MEMORY=256
+    command: memcached -m 256 -p 11211 -u memcache -v
+    ports:
+      - "11211:11211"
 
 # Uncomment for development database
 # postgres:

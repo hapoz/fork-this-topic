@@ -3,6 +3,9 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 
+// Database
+import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
+
 // Models
 import { ResourceModel } from '@/models/ResourceModel.ts';
 import { TopicModel } from '@/models/TopicModel.ts';
@@ -26,10 +29,23 @@ import { createUserRoutes } from '@/routes/userRoutes.ts';
 // Auth Middleware
 import { AuthMiddleware } from '@/auth/AuthMiddleware.ts';
 
-// Initialize models
-const topicModel = new TopicModel();
-const resourceModel = new ResourceModel();
-const userModel = new UserModel();
+// Development tools
+import { devTools } from '@/utils/dev-tools.ts';
+
+// Initialize Memcached database
+const memcachedConfig = {
+  host: Deno.env.get('MEMCACHED_HOST') || 'localhost',
+  port: parseInt(Deno.env.get('MEMCACHED_PORT') || '11211'),
+  timeout: 5000,
+  retries: 3,
+};
+
+const db = new MemcachedAdapter(memcachedConfig);
+
+// Initialize models with Memcached
+const topicModel = new TopicModel(db);
+const resourceModel = new ResourceModel(db);
+const userModel = new UserModel(db);
 
 // Initialize services
 const topicService = new TopicService(topicModel);
@@ -61,13 +77,26 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'API is running',
-    timestamp: new Date().toISOString(),
-  });
+// Health check endpoint with database status
+app.get('/health', async (_req, res) => {
+  try {
+    const dbHealth = await db.healthCheck();
+    const healthResponse = devTools.createHealthResponse();
+
+    res.status(200).json({
+      ...healthResponse,
+      database: dbHealth,
+      success: true,
+      message: 'API is running',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Health check failed',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // Public routes (no authentication required)
@@ -94,7 +123,7 @@ app.use(
 );
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('*', (_req, res) => {
   res.status(404).json({
     success: false,
     error: 'Route not found',
@@ -105,9 +134,9 @@ app.use('*', (req, res) => {
 app.use(
   (
     err: Error,
-    req: express.Request,
+    _req: express.Request,
     res: express.Response,
-    next: express.NextFunction,
+    _next: express.NextFunction,
   ) => {
     console.error('Error:', err);
     res.status(500).json({
@@ -117,16 +146,47 @@ app.use(
   },
 );
 
-// Start server
-app.listen(parseInt(PORT), () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📚 Dynamic Knowledge Base API`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  console.log(`📖 API docs:`);
-  console.log(`   - Topics: http://localhost:${PORT}/api/topics`);
-  console.log(`   - Resources: http://localhost:${PORT}/api/resources`);
-  console.log(`   - Users: http://localhost:${PORT}/api/users`);
-  console.log(`   - Admin: http://localhost:${PORT}/api/admin/users`);
+// Start server with database connection
+async function startServer() {
+  try {
+    // Connect to Memcached
+    await db.connect();
+    devTools.info('Connected to Memcached database');
+
+    // Start Express server
+    app.listen(parseInt(PORT), () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+      console.log(`📚 Dynamic Knowledge Base API`);
+      console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+      console.log(`📖 API docs:`);
+      console.log(`   - Topics: http://localhost:${PORT}/api/topics`);
+      console.log(`   - Resources: http://localhost:${PORT}/api/resources`);
+      console.log(`   - Users: http://localhost:${PORT}/api/users`);
+      console.log(`   - Admin: http://localhost:${PORT}/api/admin/users`);
+      console.log(
+        `💾 Database: Memcached (${memcachedConfig.host}:${memcachedConfig.port})`,
+      );
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    Deno.exit(1);
+  }
+}
+
+// Graceful shutdown
+Deno.addSignalListener('SIGINT', async () => {
+  console.log('\n🛑 Shutting down server...');
+  await db.disconnect();
+  Deno.exit(0);
 });
+
+Deno.addSignalListener('SIGTERM', async () => {
+  console.log('\n🛑 Shutting down server...');
+  await db.disconnect();
+  Deno.exit(0);
+});
+
+// Start the server
+startServer();
 
 export default app;

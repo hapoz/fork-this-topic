@@ -6,6 +6,8 @@ services:
     environment:
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
+      - MEMCACHED_HOST=memcached
+      - MEMCACHED_PORT=11211
     volumes:
       # Remove development volume mounts for production
       - /app/node_modules
@@ -30,6 +32,22 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      - memcached
+
+  memcached:
+    # Production Memcached configuration
+    image: memcached:1.6-alpine
+    container_name: knowledge-base-memcached-prod
+    command: memcached -m 1024 -p 11211 -u memcache
+    restart: always
+    volumes:
+      - memcached_prod_data:/data
+    healthcheck:
+      test: ["CMD", "echo", "stats", "|", "nc", "localhost", "11211"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Production database (uncomment and configure as needed)
   # postgres:
@@ -56,6 +74,7 @@ services:
   #     - knowledge-base-network
 
 volumes:
+memcached_prod_data:
 # postgres_prod_data:
 # redis_prod_data:
 

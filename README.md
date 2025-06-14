@@ -1,6 +1,6 @@
 # Dynamic Knowledge Base API
 
-A RESTful API for a Dynamic Knowledge Base System with version control and hierarchical topics, built with Deno and Express.js.
+A RESTful API for a Dynamic Knowledge Base System with version control and hierarchical topics, built with Deno, Express.js, and **Memcached** for high-performance in-memory storage.
 
 ## 🚀 Features
 
@@ -10,6 +10,41 @@ A RESTful API for a Dynamic Knowledge Base System with version control and hiera
 - **User Authentication**: Secure API with role-based access
 - **RESTful Design**: Clean, intuitive API endpoints
 - **TypeScript**: Full type safety and modern development experience
+- **Memcached Database**: High-performance in-memory storage with persistence
+
+## 🗄️ Database: Memcached
+
+This project uses **Memcached** as the primary database for high-performance in-memory storage:
+
+### **Benefits of Memcached**
+
+- ⚡ **Ultra-fast**: In-memory storage for maximum performance
+- 🔄 **Persistent**: Data survives container restarts (with proper configuration)
+- 📈 **Scalable**: Can be clustered for high availability
+- 🛡️ **Reliable**: Battle-tested in production environments
+- 💾 **Memory Efficient**: Automatic eviction policies
+
+### **Database Architecture**
+
+- **Key-Value Storage**: Each entity stored with unique keys
+- **Indexed Collections**: Maintains indexes for fast queries
+- **JSON Serialization**: Complex objects stored as JSON strings
+- **TTL Support**: Optional expiration for cache management
+- **Health Monitoring**: Built-in health checks and statistics
+
+### **Data Structure**
+
+```
+topics:index → [topic_id_1, topic_id_2, ...]
+topics:topic_id_1 → { id, name, content, version, ... }
+topics:topic_id_2 → { id, name, content, version, ... }
+
+users:index → [user_id_1, user_id_2, ...]
+users:user_id_1 → { id, name, email, role, ... }
+
+resources:index → [resource_id_1, resource_id_2, ...]
+resources:resource_id_1 → { id, topicId, url, type, ... }
+```
 
 ## 🛠️ Development Tools
 
@@ -80,6 +115,7 @@ This will check:
 - ✅ Dependencies configuration
 - ✅ File structure
 - ✅ Required permissions
+- ✅ Memcached connectivity
 
 ### Performance Benchmarks
 
@@ -96,6 +132,7 @@ Benchmarks include:
 - JSON serialization/deserialization
 - UUID generation
 - Array operations
+- Memcached operations
 
 ### Development Utilities
 
@@ -104,7 +141,7 @@ The project includes a comprehensive development utilities module (`utils/dev-to
 - **Logging**: Structured logging with configurable levels
 - **Performance Monitoring**: Memory usage and system information
 - **Environment Validation**: Check required environment variables
-- **Health Checks**: Generate health check responses
+- **Health Checks**: Generate health check responses with database status
 - **Performance Measurement**: Time function execution
 
 ## 📁 Project Structure
@@ -113,7 +150,13 @@ The project includes a comprehensive development utilities module (`utils/dev-to
 ├── main.ts                 # Application entry point
 ├── deno.json              # Deno configuration and tasks
 ├── deno.lock              # Dependency lock file
+├── database/              # Database layer
+│   └── MemcachedAdapter.ts # Memcached database adapter
 ├── models/                # Data models
+│   ├── MemcachedBaseModel.ts # Base model for Memcached
+│   ├── TopicModel.ts      # Topic model
+│   ├── UserModel.ts       # User model
+│   └── ResourceModel.ts   # Resource model
 ├── services/              # Business logic services
 ├── controllers/           # Request handlers
 ├── routes/                # API route definitions
@@ -123,6 +166,7 @@ The project includes a comprehensive development utilities module (`utils/dev-to
 ├── test/                  # Test files
 │   ├── unit/             # Unit tests
 │   ├── integration/      # Integration tests
+│   │   └── memcached.test.ts # Memcached integration tests
 │   └── patterns/         # Pattern tests
 ├── benchmarks/           # Performance benchmarks
 │   └── simple.bench.ts   # Simple benchmarks
@@ -141,6 +185,10 @@ NODE_ENV=development      # Environment (development/production)
 DEBUG=true               # Enable debug logging
 LOG_LEVEL=info          # Log level (debug/info/warn/error)
 HOST=localhost          # Server host
+
+# Memcached Configuration
+MEMCACHED_HOST=localhost # Memcached server host
+MEMCACHED_PORT=11211    # Memcached server port
 ```
 
 ### Deno Configuration
@@ -170,6 +218,12 @@ deno task test:unit
 deno task test:integration
 ```
 
+### Memcached Integration Tests
+
+```bash
+deno task test:integration
+```
+
 ### Pattern Tests
 
 ```bash
@@ -193,6 +247,15 @@ const memory = devTools.getMemoryUsage();
 console.log(`Memory usage: ${memory.heapUsed}MB`);
 ```
 
+### Database Health
+
+```typescript
+import { db } from '@/database/MemcachedAdapter.ts';
+
+const health = await db.healthCheck();
+console.log(`Database status: ${health.status}`);
+```
+
 ### Performance Measurement
 
 ```typescript
@@ -206,22 +269,35 @@ const result = await devTools.measurePerformance('API Call', async () => {
 
 ## 🚀 Deployment
 
-### Development
+### Development with Docker
 
 ```bash
+# Start with Memcached
+docker-compose up
+
+# Or run in detached mode
+docker-compose up -d
+```
+
+### Production with Docker
+
+```bash
+# Set environment variables
+export JWT_SECRET=your-production-secret-key
+export NODE_ENV=production
+
+# Start production services with Memcached
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+### Local Development
+
+```bash
+# Start Memcached locally
+docker run -d -p 11211:11211 --name memcached memcached:1.6-alpine
+
+# Start the API
 deno task dev
-```
-
-### Production
-
-```bash
-deno task start:prod
-```
-
-### Compile to Executable
-
-```bash
-deno task compile:release
 ```
 
 ## 🔍 Code Quality
@@ -283,3 +359,4 @@ For issues and questions:
 1. Check the development setup: `deno run --allow-env --allow-read scripts/dev-setup.ts`
 2. Run validation: `deno task validate`
 3. Check documentation: `deno task doc:serve`
+4. Verify Memcached connectivity: Check health endpoint `/health`

@@ -1,9 +1,14 @@
+import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
 import { TopicVersionFactory } from '@/factories/TopicVersionFactory.ts';
-import { BaseModel } from '@/models/BaseModel.ts';
+import { MemcachedBaseModel } from '@/models/MemcachedBaseModel.ts';
 import { Topic, TopicVersion } from '@/types/index.ts';
 
-export class TopicModel extends BaseModel<Topic> {
+export class TopicModel extends MemcachedBaseModel<Topic> {
   private versions: Map<string, TopicVersion[]> = new Map();
+
+  constructor(db: MemcachedAdapter) {
+    super(db, 'topics');
+  }
 
   async createTopic(
     topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>,
@@ -63,8 +68,7 @@ export class TopicModel extends BaseModel<Topic> {
   }
 
   async getChildren(parentId: string): Promise<Topic[]> {
-    const allTopics = await this.findAll();
-    return allTopics.filter((topic) => topic.parentTopicId === parentId);
+    return await this.findByField('parentTopicId', parentId);
   }
 
   async getRootTopics(): Promise<Topic[]> {
@@ -73,9 +77,8 @@ export class TopicModel extends BaseModel<Topic> {
   }
 
   async searchTopics(searchTerm: string): Promise<Topic[]> {
-    const allTopics = await this.findAll();
     const term = searchTerm.toLowerCase();
-    return allTopics.filter((topic) =>
+    return await this.search((topic) =>
       topic.name.toLowerCase().includes(term) ||
       topic.content.toLowerCase().includes(term)
     );

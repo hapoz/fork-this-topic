@@ -1,6 +1,20 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@avroit/memcached@^0.0.4": "0.0.4",
+    "jsr:@std/assert@0.218": "0.218.2",
+    "jsr:@std/assert@~0.218.2": "0.218.2",
+    "jsr:@std/async@~0.218.2": "0.218.2",
+    "jsr:@std/cli@~0.218.2": "0.218.2",
+    "jsr:@std/encoding@~0.218.2": "0.218.2",
+    "jsr:@std/fmt@~0.218.2": "0.218.2",
+    "jsr:@std/fs@0.218": "0.218.2",
+    "jsr:@std/http@0.218": "0.218.2",
+    "jsr:@std/json@0.218": "0.218.2",
+    "jsr:@std/media-types@~0.218.2": "0.218.2",
+    "jsr:@std/path@0.218": "0.218.2",
+    "jsr:@std/path@~0.218.2": "0.218.2",
+    "jsr:@std/streams@~0.218.2": "0.218.2",
     "npm:@types/cors@^2.8.17": "2.8.19",
     "npm:@types/express@^4.17.21": "4.17.23",
     "npm:@types/node@*": "22.15.15",
@@ -10,6 +24,73 @@
     "npm:express@^4.18.2": "4.21.2",
     "npm:helmet@^7.1.0": "7.2.0",
     "npm:uuid@^9.0.1": "9.0.1"
+  },
+  "jsr": {
+    "@avroit/memcached@0.0.4": {
+      "integrity": "9a0d3ce5f27f48e0ee53e0a84008ccd8b4ea9c9a258704a70a9d5a38a303cd80"
+    },
+    "@std/assert@0.218.2": {
+      "integrity": "7f0a5a1a8cf86607cd6c2c030584096e1ffad27fc9271429a8cb48cfbdee5eaf",
+      "dependencies": [
+        "jsr:@std/fmt"
+      ]
+    },
+    "@std/async@0.218.2": {
+      "integrity": "4528bfe132189719bfbf34756df70d870b5a845d49dce17466b5297546ad8ff9"
+    },
+    "@std/cli@0.218.2": {
+      "integrity": "7877f41b4369f51b2ee06132b678ceee703051671c0fcea9058c1c0242652098",
+      "dependencies": [
+        "jsr:@std/assert@~0.218.2"
+      ]
+    },
+    "@std/encoding@0.218.2": {
+      "integrity": "da55a763c29bf0dbf06fd286430b358266eb99c28789d89fe9a3e28edecb8d8e"
+    },
+    "@std/fmt@0.218.2": {
+      "integrity": "99526449d2505aa758b6cbef81e7dd471d8b28ec0dcb1491d122b284c548788a"
+    },
+    "@std/fs@0.218.2": {
+      "integrity": "dd9431453f7282e8c577cc22c9e6d036055a9a980b5549f887d6012969fabcca",
+      "dependencies": [
+        "jsr:@std/assert@~0.218.2",
+        "jsr:@std/path@~0.218.2"
+      ]
+    },
+    "@std/http@0.218.2": {
+      "integrity": "54223b62702e665b9dab6373ea2e51235e093ef47228d21cfa0469ee5ac75c9b",
+      "dependencies": [
+        "jsr:@std/assert@~0.218.2",
+        "jsr:@std/async",
+        "jsr:@std/cli",
+        "jsr:@std/encoding",
+        "jsr:@std/fmt",
+        "jsr:@std/media-types",
+        "jsr:@std/path@~0.218.2",
+        "jsr:@std/streams"
+      ]
+    },
+    "@std/json@0.218.2": {
+      "integrity": "2cdb9d0e86fed2c0623053f705c9004343e0b66fdfbc7b78d5941f12ca1a3a2f",
+      "dependencies": [
+        "jsr:@std/streams"
+      ]
+    },
+    "@std/media-types@0.218.2": {
+      "integrity": "1ed3bd2a05e44bad3fc2bab1767d0ce7f2fd68baee62a980751ce51633acb788"
+    },
+    "@std/path@0.218.2": {
+      "integrity": "b568fd923d9e53ad76d17c513e7310bda8e755a3e825e6289a0ce536404e2662",
+      "dependencies": [
+        "jsr:@std/assert@~0.218.2"
+      ]
+    },
+    "@std/streams@0.218.2": {
+      "integrity": "2af3cab7bb4364575e8616fd36e8df69c5b2ff49b25c5b865c26178e7da2c096",
+      "dependencies": [
+        "jsr:@std/assert@~0.218.2"
+      ]
+    }
   },
   "npm": {
     "@types/body-parser@1.19.6": {
@@ -535,6 +616,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@avroit/memcached@^0.0.4",
       "jsr:@std/assert@0.218",
       "jsr:@std/fs@0.218",
       "jsr:@std/http@0.218",
