@@ -1,5 +1,4 @@
 import { TopicModel } from '@/models/TopicModel.ts';
-import { ITopicService } from '@/services/interfaces/ITopicService.ts';
 import {
   ShortestPathResult,
   Topic,
@@ -7,6 +6,7 @@ import {
   TopicTree,
   TopicVersion,
 } from '@/types/index.ts';
+import { ITopicService } from '@/types/interfaces/ITopicService.ts';
 
 export class TopicService implements ITopicService {
   private topicModel: TopicModel;

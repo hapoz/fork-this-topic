@@ -1,7 +1,7 @@
+import { JWTAuth } from '@/auth/JWTAuth.ts';
+import { ApiResponse, UserRole } from '@/types/index.ts';
+import { IUserService } from '@/types/interfaces/IUserService.ts';
 import { Request, Response } from 'express';
-import { JWTAuth } from '../auth/JWTAuth.ts';
-import { IUserService } from '../services/interfaces/IUserService.ts';
-import { ApiResponse, UserRole } from '../types/index.ts';
 
 export class UserController {
   private userService: IUserService;

@@ -1,6 +1,6 @@
-import { UserModel } from '../models/UserModel.ts';
-import { User, UserRole } from '../types/index.ts';
-import { IUserService } from './interfaces/IUserService.ts';
+import { UserModel } from '@/models/UserModel.ts';
+import { User, UserRole } from '@/types/index.ts';
+import { IUserService } from '@/types/interfaces/IUserService.ts';
 
 export class UserService implements IUserService {
   private userModel: UserModel;

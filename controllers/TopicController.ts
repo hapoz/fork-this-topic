@@ -1,5 +1,5 @@
-import { ITopicService } from '@/services/interfaces/ITopicService.ts';
 import { ApiResponse, TopicFilters } from '@/types/index.ts';
+import { ITopicService } from '@/types/interfaces/ITopicService.ts';
 import { Request, Response } from 'express';
 import { PermissionStrategyFactory } from '../auth/PermissionStrategy.ts';
 

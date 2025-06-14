@@ -3,12 +3,56 @@ import {
   assertExists,
   assertRejects,
 } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import { MemcachedAdapter } from '../../database/MemcachedAdapter.ts';
 import { UserModel } from '../../models/UserModel.ts';
 import { UserService } from '../../services/UserService.ts';
 import { UserRole } from '../../types/index.ts';
 
+class MockMemcachedAdapter extends MemcachedAdapter {
+  private store = new Map<string, string>();
+  constructor() {
+    super({ host: 'localhost', port: 11211 });
+  }
+  override async set<T>(key: string, value: T): Promise<boolean> {
+    this.store.set(key, JSON.stringify(value));
+    return true;
+  }
+  override async get<T>(key: string): Promise<T | null> {
+    const value = this.store.get(key);
+    return value ? JSON.parse(value) : null;
+  }
+  override async delete(key: string): Promise<boolean> {
+    return this.store.delete(key);
+  }
+  override async exists(key: string): Promise<boolean> {
+    return this.store.has(key);
+  }
+  override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {
+    const result = new Map<string, T>();
+    for (const key of keys) {
+      const value = await this.get<T>(key);
+      if (value !== null) result.set(key, value);
+    }
+    return result;
+  }
+  override async setMultiple<T>(
+    entries: Array<{ key: string; value: T }>,
+  ): Promise<boolean> {
+    for (const { key, value } of entries) {
+      await this.set(key, value);
+    }
+    return true;
+  }
+  override async deleteMultiple(keys: string[]): Promise<boolean> {
+    for (const key of keys) {
+      await this.delete(key);
+    }
+    return true;
+  }
+}
+
 Deno.test('UserService - createUser', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const userData = {
@@ -29,7 +73,7 @@ Deno.test('UserService - createUser', async () => {
 });
 
 Deno.test('UserService - createUser duplicate email', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const userData = {
@@ -48,7 +92,7 @@ Deno.test('UserService - createUser duplicate email', async () => {
 });
 
 Deno.test('UserService - getUser', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const user = await userService.createUser({
@@ -65,7 +109,7 @@ Deno.test('UserService - getUser', async () => {
 });
 
 Deno.test('UserService - getUser non-existent', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const result = await userService.getUser('non-existent-id');
@@ -74,7 +118,7 @@ Deno.test('UserService - getUser non-existent', async () => {
 });
 
 Deno.test('UserService - getUserByEmail', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const user = await userService.createUser({
@@ -91,7 +135,7 @@ Deno.test('UserService - getUserByEmail', async () => {
 });
 
 Deno.test('UserService - getUserByEmail non-existent', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const result = await userService.getUserByEmail('nonexistent@example.com');
@@ -100,7 +144,7 @@ Deno.test('UserService - getUserByEmail non-existent', async () => {
 });
 
 Deno.test('UserService - updateUser', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const user = await userService.createUser({
@@ -121,7 +165,7 @@ Deno.test('UserService - updateUser', async () => {
 });
 
 Deno.test('UserService - deleteUser', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const user = await userService.createUser({
@@ -138,7 +182,7 @@ Deno.test('UserService - deleteUser', async () => {
 });
 
 Deno.test('UserService - getAllUsers', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   await userService.createUser({
@@ -156,12 +200,12 @@ Deno.test('UserService - getAllUsers', async () => {
   const users = await userService.getAllUsers();
 
   assertEquals(users.length, 2);
-  assertEquals(users[0].name, 'User 1');
-  assertEquals(users[1].name, 'User 2');
+  assertEquals(users![0]!.name, 'User 1');
+  assertEquals(users![1]!.name, 'User 2');
 });
 
 Deno.test('UserService - getUsersByRole', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   await userService.createUser({
@@ -184,16 +228,16 @@ Deno.test('UserService - getUsersByRole', async () => {
 
   const editors = await userService.getUsersByRole(UserRole.EDITOR);
   assertEquals(editors.length, 2);
-  assertEquals(editors[0].role, UserRole.EDITOR);
-  assertEquals(editors[1].role, UserRole.EDITOR);
+  assertEquals(editors![0]!.role, UserRole.EDITOR);
+  assertEquals(editors![1]!.role, UserRole.EDITOR);
 
   const viewers = await userService.getUsersByRole(UserRole.VIEWER);
   assertEquals(viewers.length, 1);
-  assertEquals(viewers[0].role, UserRole.VIEWER);
+  assertEquals(viewers![0]!.role, UserRole.VIEWER);
 });
 
 Deno.test('UserService - authenticateUser', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const user = await userService.createUser({
@@ -214,7 +258,7 @@ Deno.test('UserService - authenticateUser', async () => {
 });
 
 Deno.test('UserService - authenticateUser non-existent', async () => {
-  const userModel = new UserModel();
+  const userModel = new UserModel(new MockMemcachedAdapter());
   const userService = new UserService(userModel);
 
   const authenticatedUser = await userService.authenticateUser(

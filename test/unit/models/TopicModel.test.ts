@@ -2,10 +2,54 @@ import {
   assertEquals,
   assertExists,
 } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import { MemcachedAdapter } from '../../../database/MemcachedAdapter.ts';
 import { TopicModel } from '../../../models/TopicModel.ts';
 
+class MockMemcachedAdapter extends MemcachedAdapter {
+  private store = new Map<string, string>();
+  constructor() {
+    super({ host: 'localhost', port: 11211 });
+  }
+  override async set<T>(key: string, value: T): Promise<boolean> {
+    this.store.set(key, JSON.stringify(value));
+    return true;
+  }
+  override async get<T>(key: string): Promise<T | null> {
+    const value = this.store.get(key);
+    return value ? JSON.parse(value) : null;
+  }
+  override async delete(key: string): Promise<boolean> {
+    return this.store.delete(key);
+  }
+  override async exists(key: string): Promise<boolean> {
+    return this.store.has(key);
+  }
+  override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {
+    const result = new Map<string, T>();
+    for (const key of keys) {
+      const value = await this.get<T>(key);
+      if (value !== null) result.set(key, value);
+    }
+    return result;
+  }
+  override async setMultiple<T>(
+    entries: Array<{ key: string; value: T }>,
+  ): Promise<boolean> {
+    for (const { key, value } of entries) {
+      await this.set(key, value);
+    }
+    return true;
+  }
+  override async deleteMultiple(keys: string[]): Promise<boolean> {
+    for (const key of keys) {
+      await this.delete(key);
+    }
+    return true;
+  }
+}
+
 Deno.test('TopicModel - createTopic', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topicData = {
     name: 'Test Topic',
@@ -26,7 +70,7 @@ Deno.test('TopicModel - createTopic', async () => {
 });
 
 Deno.test('TopicModel - findById', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topic = await topicModel.createTopic({
     name: 'Test Topic',
@@ -41,7 +85,7 @@ Deno.test('TopicModel - findById', async () => {
 });
 
 Deno.test('TopicModel - findById non-existent', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const result = await topicModel.findById('non-existent-id');
 
@@ -49,7 +93,7 @@ Deno.test('TopicModel - findById non-existent', async () => {
 });
 
 Deno.test('TopicModel - updateTopic creates new version', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topic = await topicModel.createTopic({
     name: 'Original Topic',
@@ -69,7 +113,7 @@ Deno.test('TopicModel - updateTopic creates new version', async () => {
 });
 
 Deno.test('TopicModel - delete', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topic = await topicModel.createTopic({
     name: 'Test Topic',
@@ -84,7 +128,7 @@ Deno.test('TopicModel - delete', async () => {
 });
 
 Deno.test('TopicModel - findAll', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   await topicModel.createTopic({
     name: 'Topic 1',
@@ -104,7 +148,7 @@ Deno.test('TopicModel - findAll', async () => {
 });
 
 Deno.test('TopicModel - getVersions', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topic = await topicModel.createTopic({
     name: 'Test Topic',
@@ -119,12 +163,12 @@ Deno.test('TopicModel - getVersions', async () => {
   const versions = await topicModel.getVersions(topic.id);
 
   assertEquals(versions.length, 2);
-  assertEquals(versions[0].version, 1);
-  assertEquals(versions[1].version, 2);
+  assertEquals(versions![0]!.version, 1);
+  assertEquals(versions![1]!.version, 2);
 });
 
 Deno.test('TopicModel - getVersion', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topic = await topicModel.createTopic({
     name: 'Test Topic',
@@ -146,7 +190,7 @@ Deno.test('TopicModel - getVersion', async () => {
 });
 
 Deno.test('TopicModel - getVersion non-existent', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const topic = await topicModel.createTopic({
     name: 'Test Topic',
@@ -159,7 +203,7 @@ Deno.test('TopicModel - getVersion non-existent', async () => {
 });
 
 Deno.test('TopicModel - searchTopics', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   await topicModel.createTopic({
     name: 'JavaScript Fundamentals',
@@ -181,7 +225,7 @@ Deno.test('TopicModel - searchTopics', async () => {
 });
 
 Deno.test('TopicModel - getChildren', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const parentTopic = await topicModel.createTopic({
     name: 'Parent Topic',
@@ -197,11 +241,11 @@ Deno.test('TopicModel - getChildren', async () => {
   const children = await topicModel.getChildren(parentTopic.id);
 
   assertEquals(children.length, 1);
-  assertEquals(children[0].id, childTopic.id);
+  assertEquals(children![0]!.id, childTopic.id);
 });
 
 Deno.test('TopicModel - getRootTopics', async () => {
-  const topicModel = new TopicModel();
+  const topicModel = new TopicModel(new MockMemcachedAdapter());
 
   const rootTopic = await topicModel.createTopic({
     name: 'Root Topic',
@@ -217,5 +261,5 @@ Deno.test('TopicModel - getRootTopics', async () => {
   const rootTopics = await topicModel.getRootTopics();
 
   assertEquals(rootTopics.length, 1);
-  assertEquals(rootTopics[0].id, rootTopic.id);
+  assertEquals(rootTopics![0]!.id, rootTopic.id);
 });

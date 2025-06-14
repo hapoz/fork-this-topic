@@ -91,11 +91,6 @@ services:
   #   networks:
   #     - knowledge-base-network
 
-volumes:
-# redis_data:
-# postgres_data:
-# mongo_data:
-
 networks:
   knowledge-base-network:
     driver: bridge

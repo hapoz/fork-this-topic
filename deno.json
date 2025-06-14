@@ -16,8 +16,8 @@
     "test:patterns": "deno test --allow-net --allow-read --allow-write --allow-env test/patterns/",
     "fmt": "deno fmt",
     "fmt:check": "deno fmt --check",
-    "lint": "deno lint",
-    "lint:fix": "deno lint --fix",
+    "lint": "deno lint --exclude=docs",
+    "lint:fix": "deno lint --fix --exclude=docs",
     "check": "deno check main.ts",
     "check:all": "deno check **/*.ts",
     "compile": "deno compile --allow-net --allow-read --allow-write --allow-env main.ts",
@@ -56,7 +56,6 @@
     "@avroit/memcached": "jsr:@avroit/memcached@^0.0.4"
   },
   "compilerOptions": {
-    "allowJs": true,
     "lib": ["deno.window"],
     "strict": true,
     "noImplicitAny": true,
@@ -71,14 +70,12 @@
     "allowUnreachableCode": false
   },
   "lint": {
+    "include": ["**/*.ts", "**/*.js"],
+    "exclude": ["node_modules/", "coverage/", ".deno_dir/", "dist/", "docs/"],
     "rules": {
       "tags": ["recommended"],
       "include": ["ban-untagged-todo"],
       "exclude": ["no-explicit-any"]
-    },
-    "files": {
-      "include": ["**/*.ts", "**/*.js"],
-      "exclude": ["node_modules/", "coverage/", ".deno_dir/", "dist/"]
     }
   },
   "fmt": {

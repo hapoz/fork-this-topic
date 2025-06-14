@@ -2,12 +2,56 @@ import {
   assertEquals,
   assertExists,
 } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import { MemcachedAdapter } from '../../database/MemcachedAdapter.ts';
 import { ResourceModel } from '../../models/ResourceModel.ts';
 import { ResourceService } from '../../services/ResourceService.ts';
 import { ResourceType } from '../../types/index.ts';
 
+class MockMemcachedAdapter extends MemcachedAdapter {
+  private store = new Map<string, string>();
+  constructor() {
+    super({ host: 'localhost', port: 11211 });
+  }
+  override async set<T>(key: string, value: T): Promise<boolean> {
+    this.store.set(key, JSON.stringify(value));
+    return true;
+  }
+  override async get<T>(key: string): Promise<T | null> {
+    const value = this.store.get(key);
+    return value ? JSON.parse(value) : null;
+  }
+  override async delete(key: string): Promise<boolean> {
+    return this.store.delete(key);
+  }
+  override async exists(key: string): Promise<boolean> {
+    return this.store.has(key);
+  }
+  override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {
+    const result = new Map<string, T>();
+    for (const key of keys) {
+      const value = await this.get<T>(key);
+      if (value !== null) result.set(key, value);
+    }
+    return result;
+  }
+  override async setMultiple<T>(
+    entries: Array<{ key: string; value: T }>,
+  ): Promise<boolean> {
+    for (const { key, value } of entries) {
+      await this.set(key, value);
+    }
+    return true;
+  }
+  override async deleteMultiple(keys: string[]): Promise<boolean> {
+    for (const key of keys) {
+      await this.delete(key);
+    }
+    return true;
+  }
+}
+
 Deno.test('ResourceService - createResource', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   const resourceData = {
@@ -30,7 +74,7 @@ Deno.test('ResourceService - createResource', async () => {
 });
 
 Deno.test('ResourceService - getResource', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   const resource = await resourceService.createResource({
@@ -48,7 +92,7 @@ Deno.test('ResourceService - getResource', async () => {
 });
 
 Deno.test('ResourceService - getResource non-existent', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   const result = await resourceService.getResource('non-existent-id');
@@ -57,7 +101,7 @@ Deno.test('ResourceService - getResource non-existent', async () => {
 });
 
 Deno.test('ResourceService - updateResource', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   const resource = await resourceService.createResource({
@@ -79,7 +123,7 @@ Deno.test('ResourceService - updateResource', async () => {
 });
 
 Deno.test('ResourceService - deleteResource', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   const resource = await resourceService.createResource({
@@ -97,7 +141,7 @@ Deno.test('ResourceService - deleteResource', async () => {
 });
 
 Deno.test('ResourceService - getResourcesByTopic', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   const topicId = 'topic-1';
@@ -126,12 +170,12 @@ Deno.test('ResourceService - getResourcesByTopic', async () => {
   const resources = await resourceService.getResourcesByTopic(topicId);
 
   assertEquals(resources.length, 2);
-  assertEquals(resources[0].topicId, topicId);
-  assertEquals(resources[1].topicId, topicId);
+  assertEquals(resources![0]!.topicId, topicId);
+  assertEquals(resources![1]!.topicId, topicId);
 });
 
 Deno.test('ResourceService - getResourcesByType', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   await resourceService.createResource({
@@ -168,7 +212,7 @@ Deno.test('ResourceService - getResourcesByType', async () => {
 });
 
 Deno.test('ResourceService - searchResources', async () => {
-  const resourceModel = new ResourceModel();
+  const resourceModel = new ResourceModel(new MockMemcachedAdapter());
   const resourceService = new ResourceService(resourceModel);
 
   await resourceService.createResource({

@@ -1,6 +1,6 @@
-import { ResourceModel } from '../models/ResourceModel.ts';
-import { Resource } from '../types/index.ts';
-import { IResourceService } from './interfaces/IResourceService.ts';
+import { ResourceModel } from '@/models/ResourceModel.ts';
+import { Resource } from '@/types/index.ts';
+import { IResourceService } from '@/types/interfaces/IResourceService.ts';
 
 export class ResourceService implements IResourceService {
   private resourceModel: ResourceModel;

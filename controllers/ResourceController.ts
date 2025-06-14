@@ -1,6 +1,6 @@
+import { ApiResponse } from '@/types/index.ts';
+import { IResourceService } from '@/types/interfaces/IResourceService.ts';
 import { Request, Response } from 'express';
-import { IResourceService } from '../services/interfaces/IResourceService.ts';
-import { ApiResponse } from '../types/index.ts';
 
 export class ResourceController {
   private resourceService: IResourceService;
