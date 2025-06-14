@@ -165,6 +165,37 @@
       "isBackground": true
     },
     {
+      "label": "Deno: Serve OpenAPI",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "openapi:serve"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Deno: Validate OpenAPI",
+      "type": "shell",
+      "command": "deno",
+      "args": ["task", "openapi:validate"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Deno: Compile",
       "type": "shell",
       "command": "deno",

@@ -81,6 +81,8 @@ deno task bench            # Run performance benchmarks
 # Documentation
 deno task doc              # Generate documentation
 deno task doc:serve        # Serve documentation on port 8080
+deno task openapi:serve    # Serve OpenAPI documentation on port 8081
+deno task openapi:validate # Validate OpenAPI specification
 
 # Build & Deploy
 deno task compile          # Compile to executable
@@ -171,8 +173,11 @@ The project includes a comprehensive development utilities module (`utils/dev-to
 ├── benchmarks/           # Performance benchmarks
 │   └── simple.bench.ts   # Simple benchmarks
 ├── scripts/              # Development scripts
-│   └── dev-setup.ts      # Development setup validation
+│   ├── dev-setup.ts      # Development setup validation
+│   ├── serve-openapi.ts  # OpenAPI documentation server
+│   └── validate-openapi.ts # OpenAPI validation
 └── docs/                 # Documentation
+    └── openapi.yaml      # OpenAPI specification
 ```
 
 ## 🔧 Configuration
@@ -339,6 +344,189 @@ deno task doc
 ```bash
 deno task doc:serve
 ```
+
+### OpenAPI Documentation
+
+The project includes comprehensive OpenAPI 3.0.3 specification that documents all API endpoints:
+
+#### **Features:**
+
+- **Complete API Coverage**: All endpoints documented with examples
+- **Interactive Documentation**: Swagger UI for testing endpoints
+- **Authentication**: JWT bearer token documentation
+- **Request/Response Examples**: Detailed examples for all operations
+- **Schema Definitions**: Complete data models and types
+- **Error Responses**: All possible error scenarios documented
+
+#### **Serve OpenAPI Documentation:**
+
+```bash
+deno task openapi:serve
+```
+
+This starts a documentation server at `http://localhost:8081` with:
+
+- 📖 **Interactive Swagger UI**: Test endpoints directly in the browser
+- 🔗 **OpenAPI Spec**: Raw YAML at `/openapi.yaml`
+- 💚 **Health Check**: Server status at `/health`
+
+#### **Validate OpenAPI Specification:**
+
+```bash
+deno task openapi:validate
+```
+
+This validates the OpenAPI specification for:
+
+- ✅ **Structure**: Required fields and format
+- ✅ **Schemas**: Data model consistency
+- ✅ **References**: All schema references exist
+- ✅ **Security**: Authentication schemes
+- ✅ **Paths**: Endpoint definitions
+
+#### **API Documentation Features:**
+
+**Authentication:**
+
+```yaml
+security:
+  - bearerAuth: []
+```
+
+**Rate Limiting:**
+
+- 100 requests per 15 minutes per IP
+- Documented in all endpoints
+
+**Response Formats:**
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Operation completed successfully"
+}
+```
+
+**Error Handling:**
+
+```json
+{
+  "success": false,
+  "error": "Resource not found",
+  "message": "The requested resource was not found"
+}
+```
+
+#### **Documented Endpoints:**
+
+**Health & System:**
+
+- `GET /health` - System health check with database status
+
+**Authentication:**
+
+- `POST /api/users/login` - User authentication
+
+**Users:**
+
+- `POST /api/users` - Create user
+- `GET /api/users` - Get all users
+- `GET /api/users/{id}` - Get user by ID
+- `PUT /api/users/{id}` - Update user
+- `DELETE /api/users/{id}` - Delete user
+- `GET /api/users/role/{role}` - Get users by role
+
+**Topics:**
+
+- `POST /api/topics` - Create topic
+- `GET /api/topics` - Get all topics (with filtering)
+- `GET /api/topics/{id}` - Get topic by ID
+- `PUT /api/topics/{id}` - Update topic (creates new version)
+- `DELETE /api/topics/{id}` - Delete topic
+- `GET /api/topics/{id}/tree` - Get topic tree structure
+- `GET /api/topics/{id}/versions` - Get topic versions
+- `GET /api/topics/{id}/versions/{version}` - Get specific version
+- `GET /api/topics/search` - Search topics
+- `GET /api/topics/path/{from}/{to}` - Find shortest path
+
+**Resources:**
+
+- `POST /api/resources` - Create resource
+- `GET /api/resources` - Get all resources (with filtering)
+- `GET /api/resources/{id}` - Get resource by ID
+- `PUT /api/resources/{id}` - Update resource
+- `DELETE /api/resources/{id}` - Delete resource
+- `GET /api/resources/search` - Search resources
+
+**Admin:**
+
+- `GET /api/admin/users` - Get all users (admin only)
+
+#### **Data Models:**
+
+**User:**
+
+```yaml
+User:
+  properties:
+    id: string
+    name: string
+    email: string
+    role: UserRole
+    createdAt: date-time
+    updatedAt: date-time
+```
+
+**Topic:**
+
+```yaml
+Topic:
+  properties:
+    id: string
+    name: string
+    content: string
+    version: integer
+    parentTopicId: string (nullable)
+    createdAt: date-time
+    updatedAt: date-time
+```
+
+**Resource:**
+
+```yaml
+Resource:
+  properties:
+    id: string
+    topicId: string
+    url: string
+    description: string
+    type: ResourceType
+    createdAt: date-time
+    updatedAt: date-time
+```
+
+#### **Integration with Development Tools:**
+
+**VS Code Tasks:**
+
+- `Deno: Serve OpenAPI` - Start documentation server
+- `Deno: Validate OpenAPI` - Validate specification
+
+**CI/CD Integration:**
+
+```bash
+# Validate OpenAPI spec in CI
+deno task openapi:validate
+```
+
+**Development Workflow:**
+
+1. Update API endpoints
+2. Update OpenAPI specification
+3. Validate with `deno task openapi:validate`
+4. Serve documentation with `deno task openapi:serve`
+5. Test endpoints in Swagger UI
 
 ## 🤝 Contributing
 

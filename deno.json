@@ -25,6 +25,8 @@
     "bench": "deno bench --allow-net --allow-read --allow-write --allow-env",
     "doc": "deno doc main.ts",
     "doc:serve": "deno doc --serve=8080 main.ts",
+    "openapi:serve": "deno run --allow-net --allow-read scripts/serve-openapi.ts",
+    "openapi:validate": "deno run --allow-net --allow-read scripts/validate-openapi.ts",
     "cache": "deno cache main.ts",
     "cache:reload": "deno cache --reload main.ts",
     "upgrade": "deno upgrade",
