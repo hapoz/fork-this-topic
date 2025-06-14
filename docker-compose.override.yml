@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  api:
+    # Development-specific overrides
+    environment:
+      - NODE_ENV=development
+      - DEBUG=*
+    volumes:
+      # Mount source code for hot reloading
+      - .:/app
+      - /app/node_modules
+    command: [
+      'deno',
+      'run',
+      '--watch',
+      '--allow-net',
+      '--allow-env',
+      '--allow-read',
+      '--allow-write',
+      'main.ts',
+    ]
+    # Development ports
+    ports:
+      - '3000:3000'
+      - '9229:9229' # For debugging if needed
+
+# Uncomment for development database
+# postgres:
+#   environment:
+#     - POSTGRES_DB=knowledge_base_dev
+#     - POSTGRES_USER=postgres
+#     - POSTGRES_PASSWORD=dev_password
+#   ports:
+#     - "5432:5432"
+#   volumes:
+#     - postgres_dev_data:/var/lib/postgresql/data
+
+volumes:
+# postgres_dev_data:

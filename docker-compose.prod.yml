@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  api:
+    # Production-specific overrides
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      # Remove development volume mounts for production
+      - /app/node_modules
+    restart: always
+    # Production ports (only expose necessary ports)
+    ports:
+      - '3000:3000'
+    # Production command (no watch mode)
+    command: [
+      'deno',
+      'run',
+      '--allow-net',
+      '--allow-env',
+      '--allow-read',
+      '--allow-write',
+      'main.ts',
+    ]
+    # Production health check
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Production database (uncomment and configure as needed)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: knowledge-base-db-prod
+  #   environment:
+  #     - POSTGRES_DB=knowledge_base_prod
+  #     - POSTGRES_USER=${DB_USER}
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #   volumes:
+  #     - postgres_prod_data:/var/lib/postgresql/data
+  #   restart: always
+  #   networks:
+  #     - knowledge-base-network
+
+  # Production Redis (uncomment if needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: knowledge-base-redis-prod
+  #   volumes:
+  #     - redis_prod_data:/data
+  #   restart: always
+  #   networks:
+  #     - knowledge-base-network
+
+volumes:
+# postgres_prod_data:
+# redis_prod_data:
+
+networks:
+  knowledge-base-network:
+    driver: bridge
