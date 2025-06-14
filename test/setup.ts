@@ -5,7 +5,7 @@ import { jest } from '@jest/globals';
 jest.setTimeout(10000);
 
 // Mock console methods to reduce noise in tests
-(global as any).console = {
+(globalThis as any).console = {
   ...console,
   log: jest.fn(),
   debug: jest.fn(),

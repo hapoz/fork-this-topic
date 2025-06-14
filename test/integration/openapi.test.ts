@@ -107,7 +107,7 @@ Deno.test('OpenAPI Specification Tests', async (t) => {
 
         // Check for at least one success response
         const hasSuccessResponse = Object.keys(operation.responses).some(
-          (code) => code.startsWith('2')
+          (code) => code.startsWith('2'),
         );
         assertEquals(
           hasSuccessResponse,

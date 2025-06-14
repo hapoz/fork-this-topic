@@ -1,21 +1,21 @@
-const Fuse = window.Fuse;
+const Fuse = globalThis.Fuse;
 
-const searchInput = document.querySelector("#searchbar");
-const contentDiv = document.querySelector("#content");
-const searchResultsDiv = document.querySelector("#searchResults");
+const searchInput = document.querySelector('#searchbar');
+const contentDiv = document.querySelector('#content');
+const searchResultsDiv = document.querySelector('#searchResults');
 const currentFile =
   document.querySelector("meta[name='doc-current-file']").attributes
-    .getNamedItem("content").value;
-const pathToRoot = "../".repeat(
-  currentFile ? (currentFile.split("/").length + 1) : 0,
+    .getNamedItem('content').value;
+const pathToRoot = '../'.repeat(
+  currentFile ? (currentFile.split('/').length + 1) : 0,
 );
-searchInput.removeAttribute("style");
+searchInput.removeAttribute('style');
 
-const SEARCH_INDEX = window.DENO_DOC_SEARCH_INDEX;
+const SEARCH_INDEX = globalThis.DENO_DOC_SEARCH_INDEX;
 
 const fuse = new Fuse(SEARCH_INDEX.nodes, {
   keys: [{
-    name: "name",
+    name: 'name',
     weight: 2,
   }],
   isCaseSensitive: false,
@@ -23,16 +23,16 @@ const fuse = new Fuse(SEARCH_INDEX.nodes, {
   threshold: 0.4,
 });
 
-const loadedUrl = new URL(window.location.href);
-const val = loadedUrl.searchParams.get("q");
+const loadedUrl = new URL(globalThis.location.href);
+const val = loadedUrl.searchParams.get('q');
 if (val) {
   searchInput.value = val;
   doSearch(val);
 }
 
-window.addEventListener("load", function () {
-  document.addEventListener("keydown", function (event) {
-    if (event.key.toLowerCase() === "s") {
+globalThis.addEventListener('load', function () {
+  document.addEventListener('keydown', function (event) {
+    if (event.key.toLowerCase() === 's') {
       if (event.target !== searchInput) {
         searchInput.focus();
         event.preventDefault();
@@ -43,11 +43,11 @@ window.addEventListener("load", function () {
   const emptyPlaceholder = "Click or press 'S' to search...";
   searchInput.placeholder = emptyPlaceholder;
 
-  searchInput.addEventListener("focus", function () {
-    searchInput.placeholder = "Type your query here...";
+  searchInput.addEventListener('focus', function () {
+    searchInput.placeholder = 'Type your query here...';
   });
 
-  searchInput.addEventListener("blur", function () {
+  searchInput.addEventListener('blur', function () {
     searchInput.placeholder = emptyPlaceholder;
   });
 });
@@ -69,7 +69,7 @@ function debounce(func, delay) {
 
 const debouncedSearch = debounce(doSearch, 250);
 
-searchInput.addEventListener("input", (e) => {
+searchInput.addEventListener('input', (e) => {
   const val = e.target.value;
   debouncedSearch(val);
 });
@@ -88,23 +88,23 @@ function doSearch(val) {
 }
 
 function updateCurrentLocation(val) {
-  const url = new URL(window.location.href);
+  const url = new URL(globalThis.location.href);
   if (val) {
-    url.searchParams.set("q", val);
+    url.searchParams.set('q', val);
   } else {
-    url.searchParams.delete("q");
+    url.searchParams.delete('q');
   }
-  window.history.replaceState({}, "", url.href);
+  globalThis.history.replaceState({}, '', url.href);
 }
 
 function showPage() {
-  contentDiv.style.display = "flex";
-  searchResultsDiv.style.display = "none";
+  contentDiv.style.display = 'flex';
+  searchResultsDiv.style.display = 'none';
 }
 
 function showSearchResults() {
-  contentDiv.style.display = "none";
-  searchResultsDiv.style.display = "block";
+  contentDiv.style.display = 'none';
+  searchResultsDiv.style.display = 'block';
 }
 
 function renderResults(results) {
@@ -118,7 +118,7 @@ function renderResults(results) {
   for (const result of results) {
     const kind = result.kind.map((kind) => {
       return `<div class="text-${kind.kind} bg-${kind.kind}/15 dark:text-${kind.kind}Dark dark:bg-${kind.kind}Dark/15" title="${kind.title}">${kind.char}</div>`;
-    }).join("");
+    }).join('');
 
     html += `<li class="block">
 <a href="${pathToRoot}${result.file}/~/${result.name}.html" class="flex rounded-lg gap-4 items-center justify-between py-2 px-3 hover:bg-stone-100 dark:hover:bg-stone-800">

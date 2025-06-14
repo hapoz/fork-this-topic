@@ -6,22 +6,22 @@ function findParent(el, find) {
   } while (el = el.parentElement);
 }
 
-document.addEventListener("click", (e) => {
+document.addEventListener('click', (e) => {
   const target = findParent(
     e.target,
-    (el) => el instanceof HTMLButtonElement && el.dataset["copy"],
+    (el) => el instanceof HTMLButtonElement && el.dataset['copy'],
   );
   if (target) {
-    navigator?.clipboard?.writeText(target.dataset["copy"]);
-    target.classList.add("copied");
-    setTimeout(() => target.classList.remove("copied"), 1000);
+    navigator?.clipboard?.writeText(target.dataset['copy']);
+    target.classList.add('copied');
+    setTimeout(() => target.classList.remove('copied'), 1000);
   }
 });
 
-window.addEventListener("load", () => {
-  const usageSelector = document.getElementById("usageSelector");
+globalThis.addEventListener('load', () => {
+  const usageSelector = document.getElementById('usageSelector');
 
-  document.addEventListener("mouseup", (e) => {
+  document.addEventListener('mouseup', (e) => {
     if (
       findParent(
         e.target,
