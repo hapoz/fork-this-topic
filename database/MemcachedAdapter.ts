@@ -42,12 +42,14 @@ export class MemcachedAdapter {
   /**
    * Disconnect from Memcached
    */
-  async disconnect(): Promise<void> {
+  disconnect(): Promise<void> {
     try {
       // The client will be garbage collected when no longer referenced
       console.log('✅ Disconnected from Memcached');
+      return Promise.resolve();
     } catch (error) {
       console.error('❌ Error disconnecting from Memcached:', error);
+      return Promise.reject(error);
     }
   }
 
@@ -164,7 +166,7 @@ export class MemcachedAdapter {
   /**
    * Get all keys matching a pattern (simulated with prefix)
    */
-  async getKeysByPrefix(prefix: string): Promise<string[]> {
+  getKeysByPrefix(prefix: string): Promise<string[]> {
     try {
       // Note: Memcached doesn't support key pattern matching natively
       // This is a simplified implementation that would need to be enhanced
@@ -172,41 +174,41 @@ export class MemcachedAdapter {
       console.warn(
         '⚠️ Key pattern matching is limited in Memcached. Consider using a different approach for production.',
       );
-      return [];
+      return Promise.resolve([]);
     } catch (error) {
       console.error(`❌ Error getting keys with prefix ${prefix}:`, error);
-      return [];
+      return Promise.resolve([]);
     }
   }
 
   /**
    * Get database statistics
    */
-  async getStats(): Promise<Record<string, string>> {
+  getStats(): Promise<Record<string, string>> {
     try {
       // Since stats() might not be available, return basic info
-      return {
+      return Promise.resolve({
         status: 'connected',
         timestamp: new Date().toISOString(),
         note: 'Detailed stats not available in this Memcached client',
-      };
+      });
     } catch (error) {
       console.error('❌ Error getting Memcached stats:', error);
-      return {};
+      return Promise.resolve({});
     }
   }
 
   /**
    * Flush all data (clear the cache)
    */
-  async flush(): Promise<boolean> {
+  flush(): Promise<boolean> {
     try {
       // Since flush() might not be available, we'll simulate it
       console.warn('⚠️ Flush operation not available in this Memcached client');
-      return true;
+      return Promise.resolve(true);
     } catch (error) {
       console.error('❌ Error flushing Memcached:', error);
-      return false;
+      return Promise.resolve(false);
     }
   }
 

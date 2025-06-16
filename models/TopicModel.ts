@@ -1,26 +1,19 @@
-import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
 import { TopicVersionFactory } from '@/factories/TopicVersionFactory.ts';
-import { MemcachedBaseModel } from '@/models/MemcachedBaseModel.ts';
+import { BaseModel } from '@/models/BaseModel.ts';
 import { Topic, TopicVersion } from '@/types/index.ts';
+import { ITopicModel } from '@/types/interfaces/ITopicModel.ts';
 
-export class TopicModel extends MemcachedBaseModel<Topic> {
-  private versions: Map<string, TopicVersion[]> = new Map();
-
-  constructor(db: MemcachedAdapter) {
-    super(db, 'topics');
-  }
+export class TopicModel extends BaseModel<Topic> implements ITopicModel {
+  private topicVersions: Map<string, TopicVersion[]> = new Map();
 
   async createTopic(
     topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>,
   ): Promise<Topic> {
-    const topic = await this.create({
-      ...topicData,
-      version: 1,
-    });
-
-    // Create initial version
-    await this.createVersion(topic.id, topic);
-    return topic;
+    const newTopic = await this.create({ ...topicData, version: 1 });
+    this.topicVersions.set(newTopic.id, [
+      TopicVersionFactory.createInitialVersion(newTopic),
+    ]);
+    return newTopic;
   }
 
   async updateTopic(
@@ -32,55 +25,70 @@ export class TopicModel extends MemcachedBaseModel<Topic> {
       return null;
     }
 
-    // Create new version before updating
-    await this.createVersion(id, existingTopic);
+    const latestVersion = this.getLatestVersionNumber(id);
+    const newVersionNumber = latestVersion + 1;
 
     const updatedTopic = await this.update(id, {
       ...updates,
-      version: existingTopic.version + 1,
+      version: newVersionNumber,
     });
+
+    if (updatedTopic) {
+      this.addNewVersion(updatedTopic);
+    }
 
     return updatedTopic;
   }
 
-  async createVersion(topicId: string, topic: Topic): Promise<TopicVersion> {
-    // Use the factory instead of manual creation
-    const version = TopicVersionFactory.createVersion(topic, topic.version);
-
-    if (!this.versions.has(topicId)) {
-      this.versions.set(topicId, []);
+  private getLatestVersionNumber(topicId: string): number {
+    const versions = this.topicVersions.get(topicId);
+    if (!versions || versions.length === 0) {
+      return 0; // Or throw an error, depending on desired behavior
     }
-
-    this.versions.get(topicId)!.push(version);
-    return version;
+    return Math.max(...versions.map((v) => v.version));
   }
 
-  async getVersions(topicId: string): Promise<TopicVersion[]> {
-    return this.versions.get(topicId) || [];
+  private addNewVersion(topic: Topic): void {
+    const versions = this.topicVersions.get(topic.id) || [];
+    versions.push(TopicVersionFactory.createNextVersion(topic));
+    this.topicVersions.set(topic.id, versions);
   }
 
-  async getVersion(
+  getVersions(topicId: string): Promise<TopicVersion[]> {
+    return Promise.resolve(this.topicVersions.get(topicId) || []);
+  }
+
+  getVersion(
     topicId: string,
     version: number,
   ): Promise<TopicVersion | null> {
-    const versions = await this.getVersions(topicId);
-    return versions.find((v) => v.version === version) || null;
+    const versions = this.topicVersions.get(topicId);
+    if (!versions) {
+      return Promise.resolve(null);
+    }
+    return Promise.resolve(versions.find((v) => v.version === version) || null);
   }
 
-  async getChildren(parentId: string): Promise<Topic[]> {
-    return await this.findByField('parentTopicId', parentId);
-  }
-
-  async getRootTopics(): Promise<Topic[]> {
+  async getChildren(parentTopicId: string): Promise<Topic[]> {
     const allTopics = await this.findAll();
-    return allTopics.filter((topic) => !topic.parentTopicId);
+    return allTopics.filter((topic) => topic.parentTopicId === parentTopicId);
   }
 
   async searchTopics(searchTerm: string): Promise<Topic[]> {
-    const term = searchTerm.toLowerCase();
-    return await this.search((topic) =>
-      topic.name.toLowerCase().includes(term) ||
-      topic.content.toLowerCase().includes(term)
+    const allTopics = await this.findAll();
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return allTopics.filter(
+      (topic) =>
+        topic.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+        topic.content.toLowerCase().includes(lowerCaseSearchTerm),
     );
+  }
+
+  override async delete(id: string): Promise<boolean> {
+    const deleted = await super.delete(id);
+    if (deleted) {
+      this.topicVersions.delete(id);
+    }
+    return deleted;
   }
 }

@@ -1,13 +1,14 @@
 import { BaseEntity } from '@/types/index.ts';
+import { AbstractRepository } from './AbstractRepository.ts';
 
-export abstract class BaseModel<T extends BaseEntity> {
+export class BaseModel<T extends BaseEntity> extends AbstractRepository<T> {
   protected data: Map<string, T> = new Map();
 
-  protected generateId(): string {
+  protected override generateId(): string {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  protected createBaseEntity(): Omit<BaseEntity, 'id'> {
+  protected override createBaseEntity(): Omit<BaseEntity, 'id'> {
     const now = new Date();
     return {
       createdAt: now,
@@ -15,15 +16,17 @@ export abstract class BaseModel<T extends BaseEntity> {
     };
   }
 
-  async findAll(): Promise<T[]> {
-    return Array.from(this.data.values());
+  override async findAll(): Promise<T[]> {
+    return Promise.resolve(Array.from(this.data.values()));
   }
 
-  async findById(id: string): Promise<T | null> {
-    return this.data.get(id) || null;
+  override async findById(id: string): Promise<T | null> {
+    return Promise.resolve(this.data.get(id) || null);
   }
 
-  async create(entity: Omit<T, 'id' | 'createdAt' | 'updatedAt'>): Promise<T> {
+  override async create(
+    entity: Omit<T, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<T> {
     const id = this.generateId();
     const baseEntity = this.createBaseEntity();
 
@@ -34,10 +37,10 @@ export abstract class BaseModel<T extends BaseEntity> {
     } as T;
 
     this.data.set(id, newEntity);
-    return newEntity;
+    return Promise.resolve(newEntity);
   }
 
-  async update(
+  override async update(
     id: string,
     updates: Partial<Omit<T, 'id' | 'createdAt'>>,
   ): Promise<T | null> {
@@ -53,18 +56,18 @@ export abstract class BaseModel<T extends BaseEntity> {
     } as T;
 
     this.data.set(id, updatedEntity);
-    return updatedEntity;
+    return Promise.resolve(updatedEntity);
   }
 
-  async delete(id: string): Promise<boolean> {
-    return this.data.delete(id);
+  override async delete(id: string): Promise<boolean> {
+    return Promise.resolve(this.data.delete(id));
   }
 
-  async exists(id: string): Promise<boolean> {
-    return this.data.has(id);
+  override async exists(id: string): Promise<boolean> {
+    return Promise.resolve(this.data.has(id));
   }
 
-  async count(): Promise<number> {
-    return this.data.size;
+  override async count(): Promise<number> {
+    return Promise.resolve(this.data.size);
   }
 }

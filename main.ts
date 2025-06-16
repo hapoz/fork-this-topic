@@ -106,7 +106,8 @@ app.get('/health', async (_req, res) => {
       message: 'API is running',
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (_error: unknown) {
+    console.error('❌ Failed to start server:', _error);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
@@ -184,8 +185,8 @@ async function startServer() {
       );
       console.log(`✨ GraphQL Playground: http://localhost:${PORT}/graphql`);
     });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
+  } catch (_error: unknown) {
+    console.error('❌ Failed to start server:', _error);
     // Deno.exit(1);
   }
 }

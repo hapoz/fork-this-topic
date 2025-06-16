@@ -5,7 +5,7 @@ import {
 import { MemcachedAdapter } from '../../database/MemcachedAdapter.ts';
 import { ResourceModel } from '../../models/ResourceModel.ts';
 import { ResourceService } from '../../services/ResourceService.ts';
-import { ResourceType } from '../../types/index.ts';
+import { Resource, ResourceType } from '../../types/index.ts';
 
 class MockMemcachedAdapter extends MemcachedAdapter {
   private store = new Map<string, string>();
@@ -14,17 +14,17 @@ class MockMemcachedAdapter extends MemcachedAdapter {
   }
   override async set<T>(key: string, value: T): Promise<boolean> {
     this.store.set(key, JSON.stringify(value));
-    return true;
+    return Promise.resolve(true);
   }
   override async get<T>(key: string): Promise<T | null> {
     const value = this.store.get(key);
-    return value ? JSON.parse(value) : null;
+    return Promise.resolve(value ? JSON.parse(value) : null);
   }
   override async delete(key: string): Promise<boolean> {
-    return this.store.delete(key);
+    return Promise.resolve(this.store.delete(key));
   }
   override async exists(key: string): Promise<boolean> {
-    return this.store.has(key);
+    return Promise.resolve(this.store.has(key));
   }
   override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {
     const result = new Map<string, T>();
@@ -32,7 +32,7 @@ class MockMemcachedAdapter extends MemcachedAdapter {
       const value = await this.get<T>(key);
       if (value !== null) result.set(key, value);
     }
-    return result;
+    return Promise.resolve(result);
   }
   override async setMultiple<T>(
     entries: Array<{ key: string; value: T }>,
@@ -40,13 +40,13 @@ class MockMemcachedAdapter extends MemcachedAdapter {
     for (const { key, value } of entries) {
       await this.set(key, value);
     }
-    return true;
+    return Promise.resolve(true);
   }
   override async deleteMultiple(keys: string[]): Promise<boolean> {
     for (const key of keys) {
       await this.delete(key);
     }
-    return true;
+    return Promise.resolve(true);
   }
 }
 
@@ -167,11 +167,13 @@ Deno.test('ResourceService - getResourcesByTopic', async () => {
     type: ResourceType.PDF,
   });
 
-  const resources = await resourceService.getResourcesByTopic(topicId);
+  const resources = await resourceService.getResourcesByTopic(
+    topicId,
+  ) as Resource[];
 
   assertEquals(resources.length, 2);
-  assertEquals(resources![0]!.topicId, topicId);
-  assertEquals(resources![1]!.topicId, topicId);
+  assertEquals(resources[0].topicId, topicId);
+  assertEquals(resources[1].topicId, topicId);
 });
 
 Deno.test('ResourceService - getResourcesByType', async () => {
@@ -201,12 +203,14 @@ Deno.test('ResourceService - getResourcesByType', async () => {
 
   const articles = await resourceService.getResourcesByType(
     ResourceType.ARTICLE,
-  );
+  ) as Resource[];
   assertEquals(articles.length, 2);
   assertEquals(articles[0].type, ResourceType.ARTICLE);
   assertEquals(articles[1].type, ResourceType.ARTICLE);
 
-  const videos = await resourceService.getResourcesByType(ResourceType.VIDEO);
+  const videos = await resourceService.getResourcesByType(
+    ResourceType.VIDEO,
+  ) as Resource[];
   assertEquals(videos.length, 1);
   assertEquals(videos[0].type, ResourceType.VIDEO);
 });

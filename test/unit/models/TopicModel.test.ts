@@ -4,6 +4,7 @@ import {
 } from 'https://deno.land/std@0.208.0/assert/mod.ts';
 import { MemcachedAdapter } from '../../../database/MemcachedAdapter.ts';
 import { TopicModel } from '../../../models/TopicModel.ts';
+import { Topic, TopicVersion } from '../../../types/index.ts';
 
 class MockMemcachedAdapter extends MemcachedAdapter {
   private store = new Map<string, string>();
@@ -12,17 +13,17 @@ class MockMemcachedAdapter extends MemcachedAdapter {
   }
   override async set<T>(key: string, value: T): Promise<boolean> {
     this.store.set(key, JSON.stringify(value));
-    return true;
+    return Promise.resolve(true);
   }
   override async get<T>(key: string): Promise<T | null> {
     const value = this.store.get(key);
-    return value ? JSON.parse(value) : null;
+    return Promise.resolve(value ? JSON.parse(value) : null);
   }
   override async delete(key: string): Promise<boolean> {
-    return this.store.delete(key);
+    return Promise.resolve(this.store.delete(key));
   }
   override async exists(key: string): Promise<boolean> {
-    return this.store.has(key);
+    return Promise.resolve(this.store.has(key));
   }
   override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {
     const result = new Map<string, T>();
@@ -30,7 +31,7 @@ class MockMemcachedAdapter extends MemcachedAdapter {
       const value = await this.get<T>(key);
       if (value !== null) result.set(key, value);
     }
-    return result;
+    return Promise.resolve(result);
   }
   override async setMultiple<T>(
     entries: Array<{ key: string; value: T }>,
@@ -38,13 +39,13 @@ class MockMemcachedAdapter extends MemcachedAdapter {
     for (const { key, value } of entries) {
       await this.set(key, value);
     }
-    return true;
+    return Promise.resolve(true);
   }
   override async deleteMultiple(keys: string[]): Promise<boolean> {
     for (const key of keys) {
       await this.delete(key);
     }
-    return true;
+    return Promise.resolve(true);
   }
 }
 
@@ -140,7 +141,7 @@ Deno.test('TopicModel - findAll', async () => {
     content: 'Content 2',
   });
 
-  const topics = await topicModel.findAll();
+  const topics = await topicModel.findAll() as Topic[];
 
   assertEquals(topics.length, 2);
   assertEquals(topics[0].name, 'Topic 1');
@@ -160,11 +161,11 @@ Deno.test('TopicModel - getVersions', async () => {
     content: 'Updated content',
   });
 
-  const versions = await topicModel.getVersions(topic.id);
+  const versions = await topicModel.getVersions(topic.id) as TopicVersion[];
 
   assertEquals(versions.length, 2);
-  assertEquals(versions![0]!.version, 1);
-  assertEquals(versions![1]!.version, 2);
+  assertEquals(versions[0].version, 1);
+  assertEquals(versions[1].version, 2);
 });
 
 Deno.test('TopicModel - getVersion', async () => {
@@ -215,11 +216,13 @@ Deno.test('TopicModel - searchTopics', async () => {
     content: 'Python is another programming language',
   });
 
-  const javascriptResults = await topicModel.searchTopics('JavaScript');
+  const javascriptResults = await topicModel.searchTopics(
+    'JavaScript',
+  ) as Topic[];
   assertEquals(javascriptResults.length, 1);
   assertEquals(javascriptResults[0].name, 'JavaScript Fundamentals');
 
-  const pythonResults = await topicModel.searchTopics('Python');
+  const pythonResults = await topicModel.searchTopics('Python') as Topic[];
   assertEquals(pythonResults.length, 1);
   assertEquals(pythonResults[0].name, 'Python Basics');
 });
@@ -232,16 +235,16 @@ Deno.test('TopicModel - getChildren', async () => {
     content: 'Parent content',
   });
 
-  const childTopic = await topicModel.createTopic({
+  const _childTopic = await topicModel.createTopic({
     name: 'Child Topic',
     content: 'Child content',
     parentTopicId: parentTopic.id,
   });
 
-  const children = await topicModel.getChildren(parentTopic.id);
+  const children = await topicModel.getChildren(parentTopic.id) as Topic[];
 
   assertEquals(children.length, 1);
-  assertEquals(children![0]!.id, childTopic.id);
+  assertEquals(children[0].id, _childTopic.id);
 });
 
 Deno.test('TopicModel - getRootTopics', async () => {
@@ -252,7 +255,7 @@ Deno.test('TopicModel - getRootTopics', async () => {
     content: 'Root content',
   });
 
-  const childTopic = await topicModel.createTopic({
+  const _childTopic = await topicModel.createTopic({
     name: 'Child Topic',
     content: 'Child content',
     parentTopicId: rootTopic.id,

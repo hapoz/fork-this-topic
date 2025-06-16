@@ -15,17 +15,17 @@ class MockMemcachedAdapter extends MemcachedAdapter {
   }
   override async set<T>(key: string, value: T): Promise<boolean> {
     this.store.set(key, JSON.stringify(value));
-    return true;
+    return Promise.resolve(true);
   }
   override async get<T>(key: string): Promise<T | null> {
     const value = this.store.get(key);
-    return value ? JSON.parse(value) : null;
+    return Promise.resolve(value ? JSON.parse(value) : null);
   }
   override async delete(key: string): Promise<boolean> {
-    return this.store.delete(key);
+    return Promise.resolve(this.store.delete(key));
   }
   override async exists(key: string): Promise<boolean> {
-    return this.store.has(key);
+    return Promise.resolve(this.store.has(key));
   }
   override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {
     const result = new Map<string, T>();
@@ -33,7 +33,7 @@ class MockMemcachedAdapter extends MemcachedAdapter {
       const value = await this.get<T>(key);
       if (value !== null) result.set(key, value);
     }
-    return result;
+    return Promise.resolve(result);
   }
   override async setMultiple<T>(
     entries: Array<{ key: string; value: T }>,
@@ -41,13 +41,13 @@ class MockMemcachedAdapter extends MemcachedAdapter {
     for (const { key, value } of entries) {
       await this.set(key, value);
     }
-    return true;
+    return Promise.resolve(true);
   }
   override async deleteMultiple(keys: string[]): Promise<boolean> {
     for (const key of keys) {
       await this.delete(key);
     }
-    return true;
+    return Promise.resolve(true);
   }
 }
 

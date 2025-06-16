@@ -10,7 +10,7 @@ export abstract class TopicComponent {
 
   abstract getChildren(): TopicComponent[];
   abstract addChild(child: TopicComponent): void;
-  abstract removeChild(child: TopicComponent): void;
+  abstract removeChild(_child: TopicComponent): void;
   abstract getTopic(): Topic;
   abstract getDepth(): number;
   abstract getPath(): string[];
@@ -27,11 +27,11 @@ export class TopicLeaf extends TopicComponent {
     return [];
   }
 
-  addChild(child: TopicComponent): void {
+  addChild(_child: TopicComponent): void {
     throw new Error('Cannot add child to leaf topic');
   }
 
-  removeChild(child: TopicComponent): void {
+  removeChild(_child: TopicComponent): void {
     throw new Error('Cannot remove child from leaf topic');
   }
 
@@ -64,12 +64,12 @@ export class TopicComposite extends TopicComponent {
     return this.children;
   }
 
-  addChild(child: TopicComponent): void {
-    this.children.push(child);
+  addChild(_child: TopicComponent): void {
+    this.children.push(_child);
   }
 
-  removeChild(child: TopicComponent): void {
-    const index = this.children.indexOf(child);
+  removeChild(_child: TopicComponent): void {
+    const index = this.children.indexOf(_child);
     if (index > -1) {
       this.children.splice(index, 1);
     }

@@ -1,22 +1,12 @@
 import {
   ShortestPathResult,
   Topic,
-  TopicFilters,
   TopicTree,
   TopicVersion,
 } from '@/types/index.ts';
+import { ITopicCrudService } from './ITopicCrudService.ts';
 
-export interface ITopicService {
-  createTopic(
-    topicData: Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'version'>,
-  ): Promise<Topic>;
-  getTopic(id: string): Promise<Topic | null>;
-  updateTopic(
-    id: string,
-    updates: Partial<Omit<Topic, 'id' | 'createdAt' | 'version'>>,
-  ): Promise<Topic | null>;
-  deleteTopic(id: string): Promise<boolean>;
-  getAllTopics(filters?: TopicFilters): Promise<Topic[]>;
+export interface ITopicService extends ITopicCrudService {
   getTopicVersions(topicId: string): Promise<TopicVersion[]>;
   getTopicVersion(
     topicId: string,

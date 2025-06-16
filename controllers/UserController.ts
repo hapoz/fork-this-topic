@@ -42,18 +42,23 @@ export class UserController {
         data: user,
         message: 'User created successfully',
       } as ApiResponse);
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('already exists')) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
+      if (
+        _error instanceof Error && errorMessage.includes('already exists')
+      ) {
         res.status(409).json({
           success: false,
-          error: error.message,
+          error: errorMessage as string,
         } as ApiResponse);
         return;
       }
 
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
@@ -75,10 +80,13 @@ export class UserController {
         success: true,
         data: user,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
@@ -112,10 +120,13 @@ export class UserController {
         data: user,
         message: 'User updated successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
@@ -137,15 +148,18 @@ export class UserController {
         success: true,
         message: 'User deleted successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
 
-  async getAllUsers(req: Request, res: Response): Promise<void> {
+  async getAllUsers(_req: Request, res: Response): Promise<void> {
     try {
       const users = await this.userService.getAllUsers();
 
@@ -153,10 +167,13 @@ export class UserController {
         success: true,
         data: users,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
@@ -179,10 +196,13 @@ export class UserController {
         success: true,
         data: users,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
@@ -225,10 +245,13 @@ export class UserController {
           message: 'Login successful',
         },
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error: unknown) {
+      const errorMessage: string = (_error instanceof Error && _error.message)
+        ? _error.message
+        : 'Internal server error';
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage as string,
       } as ApiResponse);
     }
   }
