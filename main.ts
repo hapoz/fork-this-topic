@@ -1,7 +1,10 @@
 import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import { createSchema, createYoga } from 'graphql-yoga';
 import helmet from 'helmet';
+import { resolvers } from './graphql/resolvers.ts';
+import { schemaString } from './graphql/schema.ts';
 
 // Database
 import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
@@ -60,6 +63,19 @@ const userController = new UserController(userService);
 // Create Express app
 const app = express();
 const PORT = Deno.env.get('PORT') || '3000';
+
+const yoga = createYoga({
+  schema: createSchema({
+    typeDefs: schemaString,
+    resolvers: resolvers,
+  }),
+  // Integrate with Express
+  graphiql: {
+    endpoint: `/graphql`,
+  },
+});
+
+app.use('/graphql', yoga);
 
 // Security middleware
 app.use(helmet());
@@ -166,10 +182,11 @@ async function startServer() {
       console.log(
         `💾 Database: Memcached (${memcachedConfig.host}:${memcachedConfig.port})`,
       );
+      console.log(`✨ GraphQL Playground: http://localhost:${PORT}/graphql`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
-    Deno.exit(1);
+    // Deno.exit(1);
   }
 }
 
