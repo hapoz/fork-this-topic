@@ -35,6 +35,7 @@
     "preview": "deno run --allow-net --allow-read --allow-write --allow-env --watch main.ts",
     "validate": "deno fmt --check && deno lint && deno check main.ts",
     "ci": "deno fmt --check && deno lint && deno check main.ts && deno test --allow-net --allow-read --allow-write --allow-env --coverage=coverage",
+    "build": "deno fmt --check && deno lint && deno check main.ts && deno task openapi:graphql-codegen && deno task graphql:codegen",
     "swagger:codegen": "swagger-generator",
     "openapi:graphql-codegen": "npx openapi-to-graphql-cli docs/openapi.yaml --save graphql/schema.graphql && deno run --allow-read --allow-write scripts/convert-graphql-to-ts.ts",
     "graphql:codegen": "npx graphql-codegen --config codegen.ts"
