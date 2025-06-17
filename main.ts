@@ -43,7 +43,7 @@ const memcachedConfig = {
 const db = new MemcachedAdapter(memcachedConfig);
 
 // Initialize models with Memcached
-const topicModel = new TopicModel(db);
+const topicModel = new TopicModel();
 const resourceModel = new ResourceModel(db);
 const userModel = new UserModel(db);
 
