@@ -1,10 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import { createSchema, createYoga } from 'graphql-yoga';
 import helmet from 'helmet';
-import { resolvers } from './graphql/resolvers.ts';
-import { schemaString } from './graphql/schema.ts';
 
 // Database
 import { MemcachedAdapter } from '@/database/MemcachedAdapter.ts';
@@ -64,19 +61,6 @@ const userController = new UserController(userService);
 const app = express();
 const PORT = Deno.env.get('PORT') || '3000';
 
-const yoga = createYoga({
-  schema: createSchema({
-    typeDefs: schemaString,
-    resolvers: resolvers,
-  }),
-  // Integrate with Express
-  graphiql: {
-    endpoint: `/graphql`,
-  },
-});
-
-app.use('/graphql', yoga);
-
 // Security middleware
 app.use(helmet());
 app.use(cors());
@@ -94,7 +78,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint with database status
-app.get('/health', async (_req, res) => {
+app.get('/health', async (_req: express.Request, res: express.Response) => {
   try {
     const dbHealth = await db.healthCheck();
     const healthResponse = devTools.createHealthResponse();
@@ -140,7 +124,7 @@ app.use(
 );
 
 // 404 handler
-app.use('*', (_req, res) => {
+app.use('*', (_req: express.Request, res: express.Response) => {
   res.status(404).json({
     success: false,
     error: 'Route not found',
@@ -183,7 +167,6 @@ async function startServer() {
       console.log(
         `💾 Database: Memcached (${memcachedConfig.host}:${memcachedConfig.port})`,
       );
-      console.log(`✨ GraphQL Playground: http://localhost:${PORT}/graphql`);
     });
   } catch (_error: unknown) {
     console.error('❌ Failed to start server:', _error);
