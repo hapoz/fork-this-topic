@@ -46,7 +46,7 @@ export class TopicController {
         data: topic,
         message: 'Topic created successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -71,7 +71,7 @@ export class TopicController {
         success: true,
         data: topic,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -99,7 +99,7 @@ export class TopicController {
         data: topic,
         message: 'Topic updated successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -124,7 +124,7 @@ export class TopicController {
         success: true,
         message: 'Topic deleted successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -149,7 +149,7 @@ export class TopicController {
         success: true,
         data: topics,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -166,7 +166,7 @@ export class TopicController {
         success: true,
         data: versions,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -194,7 +194,7 @@ export class TopicController {
         success: true,
         data: topicVersion,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -219,7 +219,7 @@ export class TopicController {
         success: true,
         data: topicTree,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -239,7 +239,7 @@ export class TopicController {
         success: true,
         data: result,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -265,7 +265,7 @@ export class TopicController {
         success: true,
         data: topics,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({
         success: false,
         error: 'Internal server error',

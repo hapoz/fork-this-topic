@@ -16,15 +16,15 @@ export class BaseModel<T extends BaseEntity> extends AbstractRepository<T> {
     };
   }
 
-  override async findAll(): Promise<T[]> {
+  override findAll(): Promise<T[]> {
     return Promise.resolve(Array.from(this.data.values()));
   }
 
-  override async findById(id: string): Promise<T | null> {
+  override findById(id: string): Promise<T | null> {
     return Promise.resolve(this.data.get(id) || null);
   }
 
-  override async create(
+  override create(
     entity: Omit<T, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<T> {
     const id = this.generateId();
@@ -40,13 +40,13 @@ export class BaseModel<T extends BaseEntity> extends AbstractRepository<T> {
     return Promise.resolve(newEntity);
   }
 
-  override async update(
+  override update(
     id: string,
     updates: Partial<Omit<T, 'id' | 'createdAt'>>,
   ): Promise<T | null> {
     const entity = this.data.get(id);
     if (!entity) {
-      return null;
+      return Promise.resolve(null);
     }
 
     const updatedEntity = {
@@ -59,15 +59,15 @@ export class BaseModel<T extends BaseEntity> extends AbstractRepository<T> {
     return Promise.resolve(updatedEntity);
   }
 
-  override async delete(id: string): Promise<boolean> {
+  override delete(id: string): Promise<boolean> {
     return Promise.resolve(this.data.delete(id));
   }
 
-  override async exists(id: string): Promise<boolean> {
+  override exists(id: string): Promise<boolean> {
     return Promise.resolve(this.data.has(id));
   }
 
-  override async count(): Promise<number> {
+  override count(): Promise<number> {
     return Promise.resolve(this.data.size);
   }
 }

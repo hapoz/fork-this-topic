@@ -33,10 +33,14 @@ export class ResourceController {
         data: resource,
         message: 'Resource created successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }
@@ -58,10 +62,14 @@ export class ResourceController {
         success: true,
         data: resource,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }
@@ -86,10 +94,14 @@ export class ResourceController {
         data: resource,
         message: 'Resource updated successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }
@@ -111,10 +123,14 @@ export class ResourceController {
         success: true,
         message: 'Resource deleted successfully',
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }
@@ -128,10 +144,14 @@ export class ResourceController {
         success: true,
         data: resources,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }
@@ -145,10 +165,14 @@ export class ResourceController {
         success: true,
         data: resources,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }
@@ -171,10 +195,14 @@ export class ResourceController {
         success: true,
         data: resources,
       } as ApiResponse);
-    } catch (error) {
+    } catch (_error) {
+      let errorMessage = 'Internal server error';
+      if (_error instanceof Error) {
+        errorMessage = _error.message;
+      }
       res.status(500).json({
         success: false,
-        error: 'Internal server error',
+        error: errorMessage,
       } as ApiResponse);
     }
   }

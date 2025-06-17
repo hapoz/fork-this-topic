@@ -40,7 +40,7 @@ class DevSetup {
     return this.results;
   }
 
-  private async checkDenoVersion(): Promise<void> {
+  private checkDenoVersion(): Promise<void> {
     const version = Deno.version.deno;
     const major = parseInt(version?.split('.')[0] || '0');
 
@@ -54,9 +54,10 @@ class DevSetup {
       );
       this.results.success = false;
     }
+    return Promise.resolve();
   }
 
-  private async checkEnvironment(): Promise<void> {
+  private checkEnvironment(): Promise<void> {
     const envVars = ['PORT', 'NODE_ENV'];
     const missing: string[] = [];
 
@@ -82,6 +83,7 @@ class DevSetup {
         `Set environment variables: ${missing.join(', ')}`,
       );
     }
+    return Promise.resolve();
   }
 
   private async checkDependencies(): Promise<void> {
@@ -103,7 +105,7 @@ class DevSetup {
           'No dependencies found in deno.json',
         );
       }
-    } catch (error) {
+    } catch (_error) {
       this.addCheck('Dependencies', 'fail', 'Could not read deno.json');
       this.results.success = false;
     }
@@ -141,7 +143,7 @@ class DevSetup {
     }
   }
 
-  private async checkPermissions(): Promise<void> {
+  private checkPermissions(): Promise<void> {
     const permissions = [
       '--allow-net',
       '--allow-read',
@@ -153,6 +155,7 @@ class DevSetup {
       'pass',
       `Required permissions: ${permissions.join(', ')}`,
     );
+    return Promise.resolve();
   }
 
   private addCheck(

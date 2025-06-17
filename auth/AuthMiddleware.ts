@@ -36,7 +36,7 @@ export class AuthMiddleware {
       // Add user info to request
       req.user = decoded;
       next();
-    } catch (error) {
+    } catch (_error) {
       res.status(401).json({
         success: false,
         error: 'Authentication failed',

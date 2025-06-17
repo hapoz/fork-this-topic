@@ -30,6 +30,7 @@ async function runBenchmark(
   fn: () => void,
   iterations = 1000,
 ): Promise<void> {
+  await Promise.resolve();
   console.log(`\n🏃 Running benchmark: ${name}`);
   console.log(`   Iterations: ${iterations}`);
 

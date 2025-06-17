@@ -12,18 +12,18 @@ class MockMemcachedAdapter extends MemcachedAdapter {
   constructor() {
     super({ host: 'localhost', port: 11211 });
   }
-  override async set<T>(key: string, value: T): Promise<boolean> {
+  override set<T>(key: string, value: T): Promise<boolean> {
     this.store.set(key, JSON.stringify(value));
     return Promise.resolve(true);
   }
-  override async get<T>(key: string): Promise<T | null> {
+  override get<T>(key: string): Promise<T | null> {
     const value = this.store.get(key);
     return Promise.resolve(value ? JSON.parse(value) : null);
   }
-  override async delete(key: string): Promise<boolean> {
+  override delete(key: string): Promise<boolean> {
     return Promise.resolve(this.store.delete(key));
   }
-  override async exists(key: string): Promise<boolean> {
+  override exists(key: string): Promise<boolean> {
     return Promise.resolve(this.store.has(key));
   }
   override async getMultiple<T>(keys: string[]): Promise<Map<string, T>> {

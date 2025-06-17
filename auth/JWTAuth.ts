@@ -11,7 +11,6 @@ export interface JWTPayload {
 export class JWTAuth {
   private static readonly SECRET_KEY = Deno.env.get('JWT_SECRET') ||
     'your-secret-key';
-  private static readonly EXPIRES_IN = '24h';
 
   static generateToken(user: User): string {
     const payload: JWTPayload = {
@@ -38,10 +37,10 @@ export class JWTAuth {
         return null;
       }
 
-      const [header, payload, signature] = parts;
+      const [_header, payload, signature] = parts;
 
       // Verify signature (simplified for demo)
-      const expectedSignature = btoa(this.SECRET_KEY + payload);
+      const expectedSignature = btoa(this.SECRET_KEY + payload!);
       if (signature !== expectedSignature) {
         return null;
       }
@@ -54,7 +53,7 @@ export class JWTAuth {
       }
 
       return decodedPayload;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

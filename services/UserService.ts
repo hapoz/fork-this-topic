@@ -50,7 +50,7 @@ export class UserService implements IUserService {
 
   async authenticateUser(
     email: string,
-    password: string,
+    _password: string,
   ): Promise<User | null> {
     // For this demo, we'll just check if the user exists
     // In a real application, you would implement proper password hashing and verification
